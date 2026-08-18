@@ -1,0 +1,106 @@
+/* ===== BUTTONS ===== */
+.gold-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--gold);
+  color: #fff;
+  font-weight: 600;
+  font-size: 13px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 16px 28px;
+  border-radius: 60px;
+  transition: var(--transition);
+  border: none;
+  cursor: pointer;
+  box-shadow: var(--shadow-sm);
+  position: relative;
+  overflow: hidden;
+}
+
+.gold-btn::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.2), transparent);
+  opacity: 0;
+  transition: var(--transition);
+}
+
+.gold-btn:hover::after {
+  opacity: 1;
+}
+
+.gold-btn:hover {
+  background: var(--gold-dark);
+  transform: translateY(-3px) scale(1.01);
+  box-shadow: var(--shadow-md);
+}
+
+.gold-btn:active {
+  transform: scale(0.97);
+}
+
+.gold-btn.small {
+  padding: 10px 20px;
+  font-size: 11px;
+}
+
+.outline-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  border: 1.5px solid var(--border);
+  padding: 12px 22px;
+  border-radius: 60px;
+  font-weight: 500;
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--black);
+  transition: var(--transition);
+  background: transparent;
+  cursor: pointer;
+}
+
+.outline-btn:hover {
+  border-color: var(--gold);
+  color: var(--gold);
+  background: rgba(201, 160, 48, 0.04);
+  transform: translateY(-2px);
+}
+
+.text-btn {
+  font-weight: 500;
+  font-size: 13px;
+  letter-spacing: 0.04em;
+  color: var(--black);
+  border-bottom: 2px solid var(--border);
+  padding-bottom: 4px;
+  transition: var(--transition);
+  cursor: pointer;
+}
+
+.text-btn:hover {
+  color: var(--gold);
+  border-color: var(--gold);
+  transform: translateX(4px);
+}
+
+.icon-btn {
+  background: none;
+  border: none;
+  font-size: 24px;
+  color: var(--black);
+  cursor: pointer;
+  transition: var(--transition);
+  padding: 4px;
+  border-radius: 50%;
+}
+
+.icon-btn:hover {
+  color: var(--gold);
+  background: rgba(201, 160, 48, 0.08);
+  transform: rotate(10deg);
+}

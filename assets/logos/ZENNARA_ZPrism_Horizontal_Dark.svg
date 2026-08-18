@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 200" width="760" height="200">
+  <title>ZENNARA Z-Prism Horizontal — Dark Background</title>
+  <g transform="translate(30,38) scale(1.09)">
+    <polygon points="0,0 100,0 100,26 0,26" fill="#187D41"/>
+    <polygon points="0,0 62,0 0,26" fill="#13562B" opacity="0.85"/>
+    <polygon points="72,26 100,26 28,88 0,88" fill="#166535"/>
+    <polygon points="0,88 100,88 100,114 0,114" fill="#13562B"/>
+    <polygon points="40,114 100,88 100,114" fill="#0F4A24" opacity="0.9"/>
+  </g>
+  <text x="185" y="92" font-family="Arial, Helvetica, sans-serif" font-weight="800" font-size="58" letter-spacing="10" fill="#FAF8F4">ZENNARA</text>
+  <rect x="185" y="106" width="515" height="2.5" fill="#166535"/>
+  <text x="185" y="142" font-family="Arial, Helvetica, sans-serif" font-weight="600" font-size="26" letter-spacing="8" fill="#166535">ZEN F&amp;P</text>
+  <text x="185" y="172" font-family="Arial, Helvetica, sans-serif" font-weight="400" font-size="17" letter-spacing="4.5" fill="#C6C6C4">PROPERTY &amp; FACILITY MANAGEMENT</text>
+</svg>

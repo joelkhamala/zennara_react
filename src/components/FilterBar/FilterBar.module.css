@@ -1,0 +1,184 @@
+.filterBar {
+  background: transparent;
+  padding: 0;
+  margin-bottom: 48px;
+}
+
+.filterGrid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 0;
+  border: 1px solid var(--border);
+  border-radius: 2px;
+  overflow: hidden;
+  background: var(--white);
+}
+
+.filterGroup {
+  display: flex;
+  flex-direction: column;
+  padding: 20px 24px;
+  border-right: 1px solid var(--border);
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.filterGroup:last-child {
+  border-right: none;
+}
+
+.filterGroup:hover {
+  background: rgba(245, 242, 235, 0.5);
+}
+
+.filterGroup label {
+  font-size: 0.625rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+  margin-bottom: 8px;
+}
+
+.filterGroup input,
+.filterGroup select {
+  padding: 0;
+  border: none;
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  background: transparent;
+  transition: var(--transition);
+  outline: none;
+  width: 100%;
+  color: var(--text-primary);
+  font-weight: 500;
+}
+
+.filterGroup input:focus,
+.filterGroup select:focus {
+  color: var(--text-primary);
+}
+
+.filterGroup input::placeholder {
+  color: var(--text-tertiary);
+  font-weight: 400;
+}
+
+.filterGroup select {
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L5 5L9 1' stroke='%239a9a91' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right center;
+  padding-right: 20px;
+}
+
+/* Enhanced Search Group Styles */
+.searchGroup {
+  grid-column: span 1;
+}
+
+.searchInputWrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.3s ease;
+}
+
+.searchIcon {
+  position: absolute;
+  left: 0;
+  color: var(--text-tertiary);
+  flex-shrink: 0;
+  pointer-events: none;
+  transition: all 0.3s ease;
+}
+
+.searchGroup input {
+  padding-left: 24px;
+  width: 100%;
+}
+
+.searchGroup input:focus {
+  padding-left: 24px;
+}
+
+.searchGroup input:focus ~ .searchIcon,
+.searchGroup input:not(:placeholder-shown) ~ .searchIcon {
+  color: var(--gold);
+}
+
+.clearSearch {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--text-tertiary);
+  font-size: 16px;
+  padding: 0 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+  position: absolute;
+  right: 0;
+}
+
+.clearSearch:hover {
+  background: rgba(0, 0, 0, 0.05);
+  color: var(--text-primary);
+}
+
+.filterActions {
+  display: flex;
+  justify-content: flex-start;
+  margin-top: 16px;
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .filterGrid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  
+  .searchGroup {
+    grid-column: span 1;
+  }
+  
+  .filterGroup {
+    border-right: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+  }
+  
+  .filterGroup:nth-child(3n) {
+    border-right: none;
+  }
+  
+  .filterGroup:nth-last-child(-n+3) {
+    border-bottom: none;
+  }
+}
+
+@media (max-width: 768px) {
+  .filterGrid {
+    grid-template-columns: 1fr;
+  }
+  
+  .searchGroup {
+    grid-column: span 1;
+  }
+  
+  .filterGroup {
+    padding: 18px 20px;
+    border-right: none;
+    border-bottom: 1px solid var(--border);
+  }
+  
+  .filterGroup:last-child {
+    border-bottom: none;
+  }
+}

@@ -1,0 +1,74 @@
+.wrapper {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--cream);
+  padding: 40px 7vw;
+}
+
+.content {
+  text-align: center;
+  max-width: 480px;
+}
+
+.icon {
+  font-size: 56px;
+  margin-bottom: 24px;
+  color: var(--gold);
+}
+
+.content h1 {
+  font-size: 32px;
+  margin-bottom: 16px;
+  color: var(--black);
+}
+
+.content p {
+  color: var(--grey);
+  line-height: 1.7;
+  margin-bottom: 32px;
+}
+
+.actions {
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.btnPrimary {
+  background: var(--gold);
+  color: #fff;
+  border: none;
+  padding: 14px 32px;
+  border-radius: 40px;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.btnPrimary:hover {
+  background: var(--gold-dark);
+  transform: translateY(-2px);
+}
+
+.btnSecondary {
+  background: transparent;
+  color: var(--black);
+  border: 1px solid var(--border);
+  padding: 14px 32px;
+  border-radius: 40px;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.btnSecondary:hover {
+  border-color: var(--gold);
+  color: var(--gold);
+}

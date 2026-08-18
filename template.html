@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Page Title · ZENNARA</title>
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Core CSS -->
+  <link rel="stylesheet" href="assets/css/base.css">
+  <link rel="stylesheet" href="assets/css/buttons.css">
+  <link rel="stylesheet" href="assets/css/header.css">
+  <link rel="stylesheet" href="assets/css/footer.css">
+  <link rel="stylesheet" href="assets/css/hero.css">
+  <link rel="stylesheet" href="assets/css/forms.css">
+  <link rel="stylesheet" href="assets/css/components.css">
+  <link rel="stylesheet" href="assets/css/cards.css">
+  <link rel="stylesheet" href="assets/css/filters.css">
+  <link rel="stylesheet" href="assets/css/responsive.css">
+  
+  <!-- Page-specific CSS (if needed) -->
+  <style>
+    /* Page-specific styles go here */
+  </style>
+</head>
+<body>
+  
+  <!-- Header (include via JavaScript) -->
+  <div id="header-placeholder"></div>
+  
+  <main>
+    <!-- Page content goes here -->
+  </main>
+  
+  <!-- Footer (include via JavaScript) -->
+  <div id="footer-placeholder"></div>
+  
+  <!-- Core JavaScript -->
+  <script src="assets/js/utils.js"></script>
+  <script src="assets/js/navigation.js"></script>
+  <script src="assets/js/toast.js"></script>
+  <script src="assets/js/modal.js"></script>
+  
+  <!-- Include loader -->
+  <script>
+    // Load header
+    fetch('includes/header.html')
+      .then(response => response.text())
+      .then(data => {
+        document.getElementById('header-placeholder').innerHTML = data;
+        // Re-initialize navigation after header is loaded
+        const script = document.createElement('script');
+        script.src = 'assets/js/navigation.js';
+        document.body.appendChild(script);
+      });
+    
+    // Load footer
+    fetch('includes/footer.html')
+      .then(response => response.text())
+      .then(data => {
+        document.getElementById('footer-placeholder').innerHTML = data;
+      });
+  </script>
+  
+  <!-- Page-specific JavaScript -->
+  <script>
+    // Page-specific code goes here
+  </script>
+</body>
+</html>

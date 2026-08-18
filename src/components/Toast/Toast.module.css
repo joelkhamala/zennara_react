@@ -1,0 +1,33 @@
+.toast {
+  position: fixed;
+  right: 32px;
+  bottom: 32px;
+  background: var(--black);
+  color: #fff;
+  padding: 16px 24px;
+  border-radius: 60px;
+  font-size: 13px;
+  transform: translateY(120px);
+  transition: var(--transition);
+  z-index: 300;
+  box-shadow: var(--shadow-lg);
+  cursor: pointer;
+}
+
+.toast.show {
+  transform: none;
+}
+
+.toast:hover {
+  background: var(--gold);
+  transform: translateY(-4px) scale(1.02);
+}
+
+@media (max-width: 768px) {
+  .toast {
+    right: 16px;
+    bottom: 16px;
+    font-size: 12px;
+    padding: 12px 20px;
+  }
+}

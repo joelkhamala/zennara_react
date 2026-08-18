@@ -1,0 +1,620 @@
+.propertyManagement {
+  min-height: 100vh;
+}
+
+/* Hero Section */
+.hero {
+  height: 70vh;
+  min-height: 500px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.heroBackground {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+
+.heroBackground img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.heroOverlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.4));
+  z-index: 1;
+}
+
+.heroContent {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+  max-width: 900px;
+  padding: 0 7vw;
+  color: #fff;
+}
+
+.heroContent h1 {
+  font-size: clamp(42px, 6vw, 64px);
+  font-weight: 600;
+  margin: 16px 0 24px;
+  letter-spacing: -0.02em;
+  color: #fff;
+}
+
+.heroContent em {
+  font-style: italic;
+  color: var(--gold-l);
+}
+
+.heroSubtitle {
+  font-size: clamp(15px, 2vw, 18px);
+  line-height: 1.7;
+  color: rgba(255, 255, 255, 0.9);
+  max-width: 720px;
+  margin: 0 auto 32px;
+}
+
+.heroActions {
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+/* Problem/Solution Section */
+.problemSolution {
+  padding: 120px 7vw;
+  background: var(--cream);
+}
+
+.problemSolutionGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 48px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.problemCard,
+.solutionCard {
+  background: #fff;
+  border-radius: 20px;
+  padding: 48px;
+  border: 2px solid var(--border);
+  transition: var(--transition);
+}
+
+.problemCard {
+  border-left: 4px solid #d1d1d1;
+}
+
+.solutionCard {
+  border-left: 4px solid var(--gold);
+}
+
+.problemCard:hover,
+.solutionCard:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.08);
+}
+
+.cardLabel {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--grey);
+  margin-bottom: 20px;
+  opacity: 0.7;
+}
+
+.problemCard h2,
+.solutionCard h2 {
+  font-size: clamp(24px, 3vw, 32px);
+  font-weight: 600;
+  margin-bottom: 24px;
+  color: var(--black);
+  line-height: 1.3;
+  letter-spacing: -0.01em;
+}
+
+.problemCard p,
+.solutionCard p {
+  font-size: 15px;
+  line-height: 1.8;
+  color: var(--grey);
+  margin-bottom: 16px;
+}
+
+.problemCard p:last-child,
+.solutionCard p:last-child {
+  margin-bottom: 0;
+}
+
+/* Services Section */
+.servicesSection {
+  padding: 120px 7vw;
+  background: #fff;
+}
+
+.sectionHeader {
+  text-align: center;
+  max-width: 800px;
+  margin: 0 auto 72px;
+}
+
+.sectionHeader h2 {
+  font-size: clamp(36px, 5vw, 48px);
+  font-weight: 600;
+  margin: 12px 0 20px;
+  color: var(--black);
+  letter-spacing: -0.01em;
+}
+
+.sectionHeader em {
+  font-style: italic;
+  color: var(--gold);
+}
+
+.sectionSubtitle {
+  font-size: 15px;
+  line-height: 1.7;
+  color: var(--grey);
+  max-width: 680px;
+  margin: 0 auto;
+}
+
+.servicesGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.serviceCard {
+  background: #fff;
+  border: 2px solid var(--border);
+  border-radius: 16px;
+  padding: 32px;
+  transition: all 0.4s ease;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+}
+
+.serviceCard::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: var(--gold);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.4s ease;
+}
+
+.serviceCard:hover::before,
+.serviceCard.active::before {
+  transform: scaleX(1);
+}
+
+.serviceCard:hover,
+.serviceCard.active {
+  border-color: var(--gold);
+  transform: translateY(-4px);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.08);
+}
+
+.serviceIcon {
+  font-size: 36px;
+  margin-bottom: 20px;
+}
+
+.serviceCard h3 {
+  font-size: 19px;
+  font-weight: 600;
+  margin-bottom: 20px;
+  color: var(--black);
+  letter-spacing: -0.01em;
+}
+
+.serviceList {
+  list-style: none;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.serviceList li {
+  font-size: 13px;
+  color: var(--grey);
+  padding-left: 24px;
+  position: relative;
+  line-height: 1.6;
+}
+
+.serviceList li::before {
+  content: '✓';
+  position: absolute;
+  left: 0;
+  color: var(--gold);
+  font-weight: 700;
+}
+
+/* Process Section */
+.processSection {
+  padding: 120px 7vw;
+  background: var(--cream);
+}
+
+.processGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 32px;
+  max-width: 1400px;
+  margin: 0 auto;
+  position: relative;
+}
+
+.processStep {
+  text-align: center;
+  position: relative;
+}
+
+.processNumber {
+  font-size: 48px;
+  font-weight: 800;
+  color: var(--gold);
+  opacity: 0.2;
+  line-height: 1;
+  margin-bottom: 16px;
+}
+
+.processIcon {
+  font-size: 48px;
+  margin-bottom: 24px;
+}
+
+.processStep h3 {
+  font-size: 19px;
+  font-weight: 600;
+  margin-bottom: 16px;
+  color: var(--black);
+  letter-spacing: -0.01em;
+}
+
+.processStep p {
+  font-size: 14px;
+  line-height: 1.7;
+  color: var(--grey);
+}
+
+/* Arrow connector between steps */
+.processStep:not(:last-child)::after {
+  content: '→';
+  position: absolute;
+  right: -16px;
+  top: 100px;
+  color: var(--gold);
+  font-size: 24px;
+  opacity: 0.3;
+  z-index: 1;
+}
+
+/* Benefits Section */
+.benefitsSection {
+  padding: 120px 7vw;
+  background: #fff;
+}
+
+.benefitsGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 32px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.benefitCard {
+  padding: 32px;
+}
+
+.benefitIcon {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  background: var(--gold);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  font-weight: 700;
+  margin-bottom: 20px;
+}
+
+.benefitCard h3 {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 12px;
+  color: var(--black);
+  letter-spacing: -0.01em;
+}
+
+.benefitCard p {
+  font-size: 14px;
+  line-height: 1.7;
+  color: var(--grey);
+}
+
+/* Stats Section */
+.statsSection {
+  padding: 100px 7vw;
+  background: var(--black);
+}
+
+.statsGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 48px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.statCard {
+  text-align: center;
+  padding: 32px 16px;
+}
+
+.statNumber {
+  font-size: clamp(64px, 8vw, 96px);
+  font-weight: 700;
+  color: #fff;
+  line-height: 1;
+  margin-bottom: 16px;
+  letter-spacing: -0.02em;
+}
+
+.statLabel {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.6);
+  line-height: 1.6;
+}
+
+/* Property Types Section */
+.propertyTypes {
+  padding: 120px 7vw;
+  background: var(--cream);
+}
+
+.typesGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 32px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.typeCard {
+  background: #fff;
+  border: 2px solid var(--border);
+  border-radius: 16px;
+  padding: 40px;
+  transition: var(--transition);
+}
+
+.typeCard:hover {
+  border-color: var(--gold);
+  transform: translateY(-6px);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.08);
+}
+
+.typeCard h3 {
+  font-size: 22px;
+  font-weight: 600;
+  margin-bottom: 24px;
+  color: var(--black);
+  letter-spacing: -0.01em;
+}
+
+.typeCard ul {
+  list-style: none;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.typeCard li {
+  font-size: 14px;
+  color: var(--grey);
+  padding-left: 24px;
+  position: relative;
+  line-height: 1.6;
+}
+
+.typeCard li::before {
+  content: '•';
+  position: absolute;
+  left: 0;
+  color: var(--gold);
+  font-size: 20px;
+  line-height: 1;
+}
+
+/* CTA Section */
+.ctaSection {
+  padding: 120px 7vw;
+  background: #fff;
+}
+
+.ctaContent {
+  max-width: 800px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.ctaContent h2 {
+  font-size: clamp(32px, 5vw, 48px);
+  font-weight: 600;
+  margin: 12px 0 20px;
+  color: var(--black);
+  letter-spacing: -0.01em;
+}
+
+.ctaContent em {
+  font-style: italic;
+  color: var(--gold);
+}
+
+.ctaContent p {
+  font-size: 16px;
+  line-height: 1.7;
+  color: var(--grey);
+  margin-bottom: 32px;
+}
+
+.ctaActions {
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .problemSolutionGrid {
+    grid-template-columns: 1fr;
+    gap: 32px;
+  }
+
+  .servicesGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .processGrid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 48px 32px;
+  }
+
+  .processStep:nth-child(2n)::after {
+    display: none;
+  }
+
+  .benefitsGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .statsGrid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 32px;
+  }
+
+  .typesGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .hero {
+    height: 60vh;
+    min-height: 400px;
+  }
+
+  .problemSolution,
+  .servicesSection,
+  .processSection,
+  .benefitsSection,
+  .propertyTypes,
+  .ctaSection {
+    padding: 80px 7vw;
+  }
+
+  .statsSection {
+    padding: 80px 7vw;
+  }
+
+  .problemCard,
+  .solutionCard {
+    padding: 32px;
+  }
+
+  .servicesGrid {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+
+  .processGrid {
+    grid-template-columns: 1fr;
+    gap: 40px;
+  }
+
+  .processStep::after {
+    display: none !important;
+  }
+
+  .benefitsGrid {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+
+  .statsGrid {
+    grid-template-columns: 1fr;
+    gap: 32px;
+  }
+
+  .statCard {
+    padding: 24px 16px;
+  }
+
+  .heroActions,
+  .ctaActions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
+
+@media (max-width: 480px) {
+  .hero {
+    height: 50vh;
+    min-height: 350px;
+  }
+
+  .problemSolution,
+  .servicesSection,
+  .processSection,
+  .benefitsSection,
+  .propertyTypes,
+  .ctaSection {
+    padding: 60px 6vw;
+  }
+
+  .statsSection {
+    padding: 60px 6vw;
+  }
+
+  .problemCard,
+  .solutionCard {
+    padding: 24px;
+  }
+
+  .serviceCard,
+  .typeCard {
+    padding: 24px;
+  }
+}

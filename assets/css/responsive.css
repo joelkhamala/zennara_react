@@ -1,0 +1,55 @@
+/* ===== RESPONSIVE BREAKPOINTS ===== */
+
+/* Tablet */
+@media (max-width: 1024px) {
+  .desktop-nav {
+    display: none;
+  }
+
+  .menu-toggle {
+    display: flex;
+  }
+
+  .property-grid,
+  .project-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .team-grid,
+  .testimonial-grid,
+  .blog-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+  .property-grid,
+  .project-grid,
+  .team-grid,
+  .testimonial-grid,
+  .blog-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .contact-grid,
+  .investment-highlight {
+    grid-template-columns: 1fr;
+  }
+
+  .results-bar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
+
+/* Mobile Menu on Tablet and Mobile */
+@media (max-width: 1024px) {
+  .site-header {
+    height: 76px;
+  }
+
+  .site-header.scrolled {
+    height: 64px;
+  }
+}

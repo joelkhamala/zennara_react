@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>UI Components · ZENNARA</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    /* shared styles (abbreviated) */
+    * { margin:0; padding:0; box-sizing:border-box; }
+    :root {
+      --white:#FFFFFF; --cream:#F7F5F2; --light-grey:#F1EFEC; --border:#E4E1DC;
+      --gold:#C9A030; --gold-l:#E2B84A; --gold-dark:#A58528;
+      --eco:#2D7A4F; --eco-l:#3BAA6A; --black:#141414; --grey:#5E5E5E; --dark-grey:#2A2A2A;
+      --shadow-sm:0 8px 24px rgba(0,0,0,0.04); --shadow-md:0 16px 48px rgba(0,0,0,0.08);
+      --shadow-lg:0 32px 72px rgba(0,0,0,0.12); --radius:12px;
+      --transition:0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    }
+    html { scroll-behavior:smooth; }
+    body { background:var(--cream); color:var(--grey); font-family:'Inter', system-ui, sans-serif; font-weight:400; line-height:1.6; -webkit-font-smoothing:antialiased; padding-top:90px; }
+    a { color:inherit; text-decoration:none; }
+    .eyebrow { font-family:'Inter', sans-serif; font-size:11px; font-weight:600; letter-spacing:0.28em; text-transform:uppercase; color:var(--gold); margin-bottom:12px; }
+    h1, h2, h3 { font-family:'Space Grotesk', 'Inter', sans-serif; font-weight:600; color:var(--black); letter-spacing:-0.02em; }
+    .gold-btn {
+      display:inline-flex; align-items:center; gap:10px; background:var(--gold); color:#fff;
+      font-weight:600; font-size:13px; letter-spacing:0.06em; text-transform:uppercase;
+      padding:16px 28px; border-radius:60px; transition:var(--transition); border:none;
+      cursor:pointer; box-shadow:var(--shadow-sm); position:relative; overflow:hidden;
+    }
+    .gold-btn::after { content:''; position:absolute; inset:0; background:linear-gradient(135deg,rgba(255,255,255,0.2),transparent); opacity:0; transition:var(--transition); }
+    .gold-btn:hover::after { opacity:1; }
+    .gold-btn:hover { background:var(--gold-dark); transform:translateY(-3px) scale(1.01); box-shadow:var(--shadow-md); }
+    .gold-btn.small { padding:10px 20px; font-size:11px; }
+    .outline-btn {
+      display:inline-flex; align-items:center; gap:10px; border:1.5px solid var(--border);
+      padding:12px 22px; border-radius:60px; font-weight:500; font-size:12px;
+      letter-spacing:0.06em; text-transform:uppercase; color:var(--black);
+      transition:var(--transition); background:transparent; cursor:pointer;
+    }
+    .outline-btn:hover { border-color:var(--gold); color:var(--gold); background:rgba(201,160,48,0.04); transform:translateY(-2px); }
+    .text-btn {
+      font-weight:500; font-size:13px; letter-spacing:0.04em; color:var(--black);
+      border-bottom:2px solid var(--border); padding-bottom:4px;
+      transition:var(--transition); cursor:pointer;
+    }
+    .text-btn:hover { color:var(--gold); border-color:var(--gold); transform:translateX(4px); }
+    /* header */
+    .site-header {
+      position:fixed; z-index:100; top:0; left:0; right:0; height:76px; padding:0 5vw;
+      display:flex; align-items:center; justify-content:space-between;
+      background:rgba(255,255,255,0.92); backdrop-filter:blur(16px);
+      border-bottom:1px solid rgba(228,225,220,0.5); transition:var(--transition);
+    }
+    .site-header.scrolled { height:64px; background:rgba(255,255,255,0.97); box-shadow:var(--shadow-sm); }
+    .brand { display:flex; align-items:center; gap:10px; }
+    .brand-logo { height:28px; width:auto; }
+    .desktop-nav { display:flex; gap:32px; margin-left:auto; margin-right:28px; }
+    .desktop-nav a { font-size:12px; font-weight:500; letter-spacing:0.06em; text-transform:uppercase; color:var(--grey); transition:var(--transition); position:relative; cursor:pointer; }
+    .desktop-nav a::after { content:''; position:absolute; bottom:-4px; left:0; width:0; height:2px; background:var(--gold); transition:var(--transition); }
+    .desktop-nav a:hover { color:var(--black); }
+    .desktop-nav a:hover::after { width:100%; }
+    .desktop-nav a.active { color:var(--black); font-weight:600; }
+    .desktop-nav a.active::after { width:100%; }
+    .header-actions { display:flex; align-items:center; gap:16px; }
+    .icon-btn { background:none; border:none; font-size:24px; color:var(--black); cursor:pointer; transition:var(--transition); padding:4px; border-radius:50%; }
+    .icon-btn:hover { color:var(--gold); background:rgba(201,160,48,0.08); transform:rotate(10deg); }
+    .menu-toggle { display:none; flex-direction:column; gap:5px; width:28px; background:none; border:none; cursor:pointer; }
+    .menu-toggle span { display:block; width:100%; height:2.5px; background:var(--black); transition:var(--transition); border-radius:4px; }
+    .menu-toggle.open span:first-child { transform:rotate(45deg) translate(6px,6px); }
+    .menu-toggle.open span:nth-child(2) { opacity:0; }
+    .menu-toggle.open span:last-child { transform:rotate(-45deg) translate(6px,-6px); }
+    .mobile-menu {
+      position:fixed; z-index:90; inset:76px 0 auto; background:rgba(255,255,255,0.98);
+      padding:32px 7vw; transform:translateY(-120%); transition:var(--transition);
+      display:flex; flex-direction:column; gap:24px;
+      border-bottom:1px solid var(--border); box-shadow:var(--shadow-lg);
+    }
+    .mobile-menu.open { transform:none; }
+    .mobile-menu a { font-weight:500; text-transform:uppercase; letter-spacing:0.08em; color:var(--black); transition:var(--transition); }
+    .mobile-menu a:hover { color:var(--gold); padding-left:8px; }
+    /* components showcase */
+    .showcase { padding:40px 7vw 80px; }
+    .showcase h1 { font-size:48px; margin-bottom:8px; }
+    .showcase > p { color:var(--grey); margin-bottom:48px; }
+    .component-group { margin-bottom:60px; }
+    .component-group h2 { font-size:28px; margin-bottom:24px; border-bottom:2px solid var(--border); padding-bottom:12px; }
+    .component-group .grid { display:flex; gap:24px; flex-wrap:wrap; align-items:center; }
+    .component-group .grid > * { margin:0; }
+    .component-group .card-demo {
+      background:var(--white); padding:32px; border-radius:var(--radius);
+      border:1px solid var(--border); min-width:200px;
+    }
+    .component-group .card-demo h4 { font-size:14px; margin-bottom:8px; }
+    .component-group .card-demo p { font-size:13px; color:var(--grey); }
+    .badge {
+      display:inline-block; padding:4px 14px; border-radius:40px;
+      font-size:10px; font-weight:600; letter-spacing:0.06em; text-transform:uppercase;
+    }
+    .badge-gold { background:var(--gold); color:#fff; }
+    .badge-eco { background:var(--eco); color:#fff; }
+    .badge-outline { border:1px solid var(--border); color:var(--grey); }
+    .tag-group { display:flex; gap:8px; flex-wrap:wrap; }
+    .input-demo { padding:12px 16px; border:1px solid var(--border); border-radius:8px; font-family:'Inter',sans-serif; font-size:13px; background:var(--white); outline:none; transition:var(--transition); }
+    .input-demo:focus { border-color:var(--gold); box-shadow:0 0 0 3px rgba(201,160,48,0.12); }
+    .select-demo { padding:12px 16px; border:1px solid var(--border); border-radius:8px; font-family:'Inter',sans-serif; font-size:13px; background:var(--white); outline:none; cursor:pointer; }
+    .toast-demo {
+      display:inline-block; background:var(--black); color:#fff; padding:12px 24px; border-radius:60px; font-size:13px;
+    }
+    .toast-demo:hover { background:var(--gold); transform:translateY(-2px); }
+    /* footer */
+    footer { padding:60px 7vw 28px; background:var(--black); border-top:1px solid var(--dark-grey); margin-top:40px; }
+    .footer-top { display:grid; grid-template-columns:1.3fr 0.7fr 1fr 1fr; gap:40px; padding-bottom:48px; }
+    .footer-logo { height:36px; width:auto; }
+    .footer-links, .footer-social { display:flex; flex-direction:column; gap:12px; }
+    .footer-links a, .footer-social a { color:#999; font-size:12px; letter-spacing:0.04em; transition:var(--transition); }
+    .footer-links a:hover, .footer-social a:hover { color:var(--gold); transform:translateX(4px); }
+    .footer-bottom { border-top:1px solid var(--dark-grey); padding-top:20px; display:flex; justify-content:space-between; color:#666; font-size:10px; letter-spacing:0.06em; text-transform:uppercase; }
+    @media (max-width:1024px) { .desktop-nav { display:none; } .menu-toggle { display:flex; } }
+    @media (max-width:768px) { .component-group .grid { flex-direction:column; align-items:stretch; } .footer-top { grid-template-columns:1fr; gap:24px; } }
+  </style>
+</head>
+<body>
+
+<header class="site-header" id="siteHeader">
+  <a class="brand" href="index.html"><img src="assets/logos/zennara_logo.png" alt="ZENNARA" class="brand-logo"></a>
+  <nav class="desktop-nav">
+    <a href="properties.html">Properties</a>
+    <a href="listings.html">Listings</a>
+    <a href="projects.html">Projects</a>
+    <a href="advisory.html">Advisory</a>
+    <a href="portal.html">Portal</a>
+    <a href="journal.html">Journal</a>
+    <a href="contact.html">Contact</a>
+    <a class="active" href="ui-components.html">UI</a>
+  </nav>
+  <div class="header-actions">
+    <button class="icon-btn" id="searchToggle">⌕</button>
+    <a class="gold-btn small" href="property-details.html">Book a Viewing</a>
+    <button class="menu-toggle" id="menuToggle"><span></span><span></span><span></span></button>
+  </div>
+</header>
+<div class="mobile-menu" id="mobileMenu">
+  <a href="properties.html">Properties</a><a href="listings.html">Listings</a>
+  <a href="projects.html">Projects</a><a href="advisory.html">Advisory</a>
+  <a href="portal.html">Portal</a><a href="journal.html">Journal</a>
+  <a href="contact.html">Contact</a><a href="ui-components.html">UI</a>
+  <a class="gold-btn" href="property-details.html">Book a Viewing</a>
+</div>
+
+<section class="showcase">
+  <h1>UI Components</h1>
+  <p>ZENNARA's design system — buttons, badges, inputs, cards and more.</p>
+
+  <!-- Buttons -->
+  <div class="component-group">
+    <h2>Buttons</h2>
+    <div class="grid">
+      <button class="gold-btn">Primary</button>
+      <button class="gold-btn small">Small</button>
+      <button class="outline-btn">Outline</button>
+      <button class="text-btn">Text Button</button>
+      <button class="gold-btn" style="background:var(--eco);">Eco</button>
+    </div>
+  </div>
+
+  <!-- Badges & Tags -->
+  <div class="component-group">
+    <h2>Badges & Tags</h2>
+    <div class="grid">
+      <span class="badge badge-gold">Featured</span>
+      <span class="badge badge-eco">Sustainable</span>
+      <span class="badge badge-outline">New</span>
+      <span class="badge" style="background:var(--cream);color:var(--black);border:1px solid var(--border);">Coming Soon</span>
+    </div>
+  </div>
+
+  <!-- Cards -->
+  <div class="component-group">
+    <h2>Cards</h2>
+    <div class="grid">
+      <div class="card-demo">
+        <h4>Property Card</h4>
+        <p style="font-size:11px;color:var(--gold);text-transform:uppercase;letter-spacing:0.08em;">Karen · Nairobi</p>
+        <p style="font-size:20px;font-weight:700;color:var(--black);">KSh 145M</p>
+        <p style="font-size:12px;">5 Beds · 6 Baths</p>
+      </div>
+      <div class="card-demo" style="border-color:var(--gold);">
+        <h4>Active Card</h4>
+        <p style="font-size:13px;color:var(--grey);">Hover state with gold border</p>
+      </div>
+      <div class="card-demo" style="background:var(--cream);">
+        <h4>Service Card</h4>
+        <p style="font-size:13px;color:var(--grey);">Property management services</p>
+        <a href="#" class="service-link" style="color:var(--gold);font-weight:600;font-size:12px;text-transform:uppercase;letter-spacing:0.06em;">Learn More →</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Inputs -->
+  <div class="component-group">
+    <h2>Inputs & Forms</h2>
+    <div class="grid">
+      <input class="input-demo" placeholder="Full name" style="min-width:200px;">
+      <input class="input-demo" placeholder="Email" type="email" style="min-width:200px;">
+      <select class="select-demo" style="min-width:200px;">
+        <option>Select option</option>
+        <option>Option 1</option>
+        <option>Option 2</option>
+      </select>
+      <textarea class="input-demo" placeholder="Message" style="min-width:200px;min-height:80px;"></textarea>
+    </div>
+  </div>
+
+  <!-- Notifications -->
+  <div class="component-group">
+    <h2>Notifications</h2>
+    <div class="grid">
+      <div class="toast-demo">✓ Success message</div>
+      <div style="background:var(--eco-l);color:#fff;padding:12px 24px;border-radius:60px;font-size:13px;">🌿 Eco alert</div>
+      <div style="background:var(--cream);border:1px solid var(--border);padding:12px 24px;border-radius:60px;font-size:13px;">ℹ️ Information</div>
+    </div>
+  </div>
+
+  <!-- Progress / Metrics -->
+  <div class="component-group">
+    <h2>Metrics</h2>
+    <div class="grid">
+      <div style="text-align:center;padding:20px 32px;background:var(--white);border-radius:var(--radius);border:1px solid var(--border);">
+        <strong style="display:block;font-size:48px;font-weight:700;color:var(--gold);font-family:'Space Grotesk',sans-serif;">1,200+</strong>
+        <span style="font-size:11px;text-transform:uppercase;letter-spacing:0.08em;color:var(--grey);">Properties</span>
+      </div>
+      <div style="text-align:center;padding:20px 32px;background:var(--white);border-radius:var(--radius);border:1px solid var(--border);">
+        <strong style="display:block;font-size:48px;font-weight:700;color:var(--eco);font-family:'Space Grotesk',sans-serif;">98%</strong>
+        <span style="font-size:11px;text-transform:uppercase;letter-spacing:0.08em;color:var(--grey);">Satisfaction</span>
+      </div>
+      <div style="text-align:center;padding:20px 32px;background:var(--white);border-radius:var(--radius);border:1px solid var(--border);">
+        <strong style="display:block;font-size:48px;font-weight:700;color:var(--black);font-family:'Space Grotesk',sans-serif;">12</strong>
+        <span style="font-size:11px;text-transform:uppercase;letter-spacing:0.08em;color:var(--grey);">Years Expertise</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Icons -->
+  <div class="component-group">
+    <h2>Icons</h2>
+    <div class="grid">
+      <span style="font-size:32px;">⌕</span>
+      <span style="font-size:32px;">♡</span>
+      <span style="font-size:32px;">↗</span>
+      <span style="font-size:32px;">📍</span>
+      <span style="font-size:32px;">📧</span>
+      <span style="font-size:32px;">📞</span>
+      <span style="font-size:32px;">🕐</span>
+      <span style="font-size:32px;">🏠</span>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="footer-top">
+    <div class="brand"><img src="assets/logos/zennara_logo_white.png" alt="ZENNARA" class="footer-logo"></div>
+    <p style="color:#999;font-size:14px;">Luxury real estate.<br>East Africa.</p>
+    <div class="footer-links"><a href="properties.html">Properties</a><a href="projects.html">Projects</a><a href="advisory.html">Advisory</a><a href="portal.html">Portal</a></div>
+    <div class="footer-social"><a href="#">Instagram</a><a href="#">LinkedIn</a><a href="#">WhatsApp</a></div>
+  </div>
+  <div class="footer-bottom"><span>© 2026 ZENNARA. All rights reserved.</span><span>Privacy · Terms</span><span>Nairobi · Kenya</span></div>
+</footer>
+
+<script>
+  (function() {
+    const header = document.getElementById('siteHeader');
+    window.addEventListener('scroll', () => header.classList.toggle('scrolled', window.scrollY > 40));
+    const toggle = document.getElementById('menuToggle');
+    const mobileMenu = document.getElementById('mobileMenu');
+    if (toggle && mobileMenu) {
+      toggle.addEventListener('click', () => { toggle.classList.toggle('open'); mobileMenu.classList.toggle('open'); });
+    }
+  })();
+</script>
+</body>
+</html>

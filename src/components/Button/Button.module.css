@@ -1,0 +1,120 @@
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  border-radius: 60px;
+  transition: var(--transition);
+  cursor: pointer;
+  border: none;
+  text-decoration: none;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Variants */
+.gold {
+  background: var(--gold);
+  color: #fff;
+  box-shadow: var(--shadow-sm);
+}
+
+.gold::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.2), transparent);
+  opacity: 0;
+  transition: var(--transition);
+}
+
+.gold:hover::after {
+  opacity: 1;
+}
+
+.gold:hover {
+  background: var(--gold-dark);
+  transform: translateY(-3px) scale(1.01);
+  box-shadow: var(--shadow-md);
+}
+
+.outline {
+  border: 1.5px solid currentColor;
+  background: transparent;
+  color: var(--black);
+}
+
+.outline:hover {
+  border-color: var(--gold);
+  color: var(--gold);
+  background: rgba(201, 160, 48, 0.04);
+  transform: translateY(-2px);
+}
+
+/* Outline variant on dark backgrounds */
+.outline[data-theme="dark"] {
+  color: #fff;
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+.outline[data-theme="dark"]:hover {
+  border-color: var(--gold);
+  color: var(--gold);
+  background: rgba(201, 160, 48, 0.1);
+}
+
+.text {
+  background: none;
+  color: var(--black);
+  border-bottom: 2px solid var(--border);
+  padding-bottom: 4px;
+  border-radius: 0;
+}
+
+.text:hover {
+  color: var(--gold);
+  border-color: var(--gold);
+  transform: translateX(4px);
+}
+
+/* Sizes */
+.small {
+  padding: 10px 20px;
+  font-size: 11px;
+}
+
+.medium {
+  padding: 16px 28px;
+  font-size: 13px;
+}
+
+.large {
+  padding: 18px 36px;
+  font-size: 14px;
+}
+
+/* OTP-specific button styling */
+.button[type="submit"]:not(.outline) {
+  /* Allow buttons to expand in flex containers */
+}
+
+@media (max-width: 768px) {
+  .large {
+    padding: 16px 28px;
+    font-size: 13px;
+  }
+}
+
+@media (max-width: 480px) {
+  .large {
+    padding: 14px 24px;
+    font-size: 12px;
+  }
+}
+
+.button:active {
+  transform: scale(0.96);
+}

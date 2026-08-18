@@ -1,0 +1,13 @@
+const $=s=>document.querySelector(s), $$=s=>document.querySelectorAll(s);
+window.addEventListener("load",()=>setTimeout(()=>$("#preloader").classList.add("hide"),500));
+const header=$("#siteHeader");window.addEventListener("scroll",()=>header.classList.toggle("scrolled",scrollY>40));
+$("#menuToggle").addEventListener("click",()=>$("#mobileMenu").classList.toggle("open"));
+$$(".mobile-menu a").forEach(a=>a.addEventListener("click",()=>$("#mobileMenu").classList.remove("open")));
+$("#searchToggle").addEventListener("click",()=>{$("#searchOverlay").classList.add("open");setTimeout(()=>$("#overlaySearch").focus(),100)});
+$("#searchClose").addEventListener("click",()=>$("#searchOverlay").classList.remove("open"));
+document.addEventListener("keydown",e=>{if(e.key==="Escape")$("#searchOverlay").classList.remove("open")});
+$$(".heart").forEach(b=>b.addEventListener("click",()=>{b.classList.toggle("active");b.textContent=b.classList.contains("active")?"♥":"♡"}));
+const counters=$$(".counter");let counted=false;
+const countObserver=new IntersectionObserver(entries=>{if(entries.some(e=>e.isIntersecting)&&!counted){counted=true;counters.forEach(el=>{const target=+el.dataset.target;let n=0;const step=Math.max(1,Math.ceil(target/55));const timer=setInterval(()=>{n+=step;if(n>=target){n=target;clearInterval(timer)}el.textContent=n.toLocaleString()},25)})}},{threshold:.3});if(counters.length)countObserver.observe(counters[0]);
+$("#searchBtn").addEventListener("click",()=>{const purpose=$("#purpose").value,location=$("#location").value,type=$("#type").value;const toast=$("#toast");toast.textContent=`Searching ${purpose.toLowerCase()} properties in ${location} · ${type}.`;toast.classList.add("show");setTimeout(()=>toast.classList.remove("show"),3500)});
+$$('a[href^="#"]').forEach(a=>a.addEventListener("click",e=>{const id=a.getAttribute("href");if(id&&id!=="#"){const el=$(id);if(el){e.preventDefault();el.scrollIntoView({behavior:"smooth"})}}}));
