@@ -1,0 +1,184 @@
+/* ===== TOAST / NOTIFICATIONS ===== */
+.toast {
+  position: fixed;
+  right: 32px;
+  bottom: 32px;
+  background: var(--black);
+  color: #fff;
+  padding: 16px 24px;
+  border-radius: 60px;
+  font-size: 13px;
+  transform: translateY(120px);
+  transition: var(--transition);
+  z-index: 300;
+  box-shadow: var(--shadow-lg);
+  cursor: pointer;
+}
+
+.toast.show {
+  transform: none;
+}
+
+.toast:hover {
+  background: var(--gold);
+  transform: translateY(-4px) scale(1.02);
+}
+
+/* ===== BADGES & TAGS ===== */
+.badge {
+  display: inline-block;
+  padding: 4px 14px;
+  border-radius: 40px;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.badge-gold {
+  background: var(--gold);
+  color: #fff;
+}
+
+.badge-eco {
+  background: var(--eco);
+  color: #fff;
+}
+
+.badge-outline {
+  border: 1px solid var(--border);
+  color: var(--grey);
+}
+
+/* ===== PAGINATION ===== */
+.pagination {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 48px;
+}
+
+.pagination button {
+  min-width: 44px;
+  height: 44px;
+  padding: 0 16px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--white);
+  font-family: 'Inter', sans-serif;
+  font-weight: 500;
+  font-size: 13px;
+  color: var(--black);
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.pagination button:hover:not(:disabled) {
+  border-color: var(--gold);
+  color: var(--gold);
+}
+
+.pagination button.active {
+  background: var(--gold);
+  color: #fff;
+  border-color: var(--gold);
+}
+
+.pagination button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* ===== MODAL ===== */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 400;
+  display: grid;
+  place-items: center;
+  opacity: 0;
+  visibility: hidden;
+  transition: var(--transition);
+  padding: 20px;
+}
+
+.modal-overlay.open {
+  opacity: 1;
+  visibility: visible;
+}
+
+.modal-card {
+  background: var(--white);
+  max-width: 540px;
+  width: 100%;
+  padding: 48px;
+  border-radius: var(--radius);
+  position: relative;
+  transform: scale(0.95);
+  transition: var(--transition);
+}
+
+.modal-overlay.open .modal-card {
+  transform: scale(1);
+}
+
+.modal-card .close {
+  position: absolute;
+  top: 16px;
+  right: 20px;
+  background: none;
+  border: none;
+  font-size: 28px;
+  cursor: pointer;
+  color: var(--grey);
+  transition: var(--transition);
+}
+
+.modal-card .close:hover {
+  color: var(--black);
+  transform: rotate(90deg);
+}
+
+/* ===== LIGHTBOX ===== */
+.lightbox {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.9);
+  z-index: 500;
+  display: grid;
+  place-items: center;
+  opacity: 0;
+  visibility: hidden;
+  transition: var(--transition);
+  padding: 40px;
+}
+
+.lightbox.open {
+  opacity: 1;
+  visibility: visible;
+}
+
+.lightbox img {
+  max-width: 90vw;
+  max-height: 85vh;
+  object-fit: contain;
+  border-radius: 8px;
+}
+
+.lightbox .close {
+  position: absolute;
+  top: 32px;
+  right: 5vw;
+  background: none;
+  border: none;
+  color: #fff;
+  font-size: 48px;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.lightbox .close:hover {
+  transform: rotate(90deg);
+  color: var(--gold);
+}

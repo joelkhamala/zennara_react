@@ -1,0 +1,68 @@
+/* ===== RESET & ROOT VARIABLES ===== */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+:root {
+  --white: #FFFFFF;
+  --cream: #F7F5F2;
+  --light-grey: #F1EFEC;
+  --border: #E4E1DC;
+  --gold: #C9A030;
+  --gold-l: #E2B84A;
+  --gold-dark: #A58528;
+  --eco: #2D7A4F;
+  --eco-l: #3BAA6A;
+  --black: #141414;
+  --grey: #5E5E5E;
+  --dark-grey: #2A2A2A;
+  --shadow-sm: 0 8px 24px rgba(0, 0, 0, 0.04);
+  --shadow-md: 0 16px 48px rgba(0, 0, 0, 0.08);
+  --shadow-lg: 0 32px 72px rgba(0, 0, 0, 0.12);
+  --radius: 12px;
+  --transition: 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--white);
+  color: var(--grey);
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  font-weight: 400;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+img {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+}
+
+/* ===== TYPOGRAPHY ===== */
+.eyebrow {
+  font-family: 'Inter', sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 12px;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Space Grotesk', 'Inter', sans-serif;
+  font-weight: 600;
+  color: var(--black);
+  letter-spacing: -0.02em;
+}

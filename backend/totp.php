@@ -399,27 +399,47 @@ if (isset($_SERVER['SCRIPT_FILENAME']) && realpath(__FILE__) === realpath($_SERV
         
         if ($action === 'setup') {
             try {
-                if (!$user_id || !isset($input['email'])) {
+                if (!$user_id) {
+                    if (ob_get_level() > 0) ob_clean();
                     http_response_code(400);
-                    echo json_encode(['success' => false, 'error' => 'Missing parameters']);
+                    echo json_encode(['success' => false, 'error' => 'Missing user_id parameter']);
                     exit;
                 }
                 
-                $result = $totp->enable2FA($user_id, $input['email']);
+                $email = $input['email'] ?? null;
+                if (!$email) {
+                    $users_file = DATA_DIR . '/users.json';
+                    if (file_exists($users_file)) {
+                        $users = json_decode(file_get_contents($users_file), true) ?: [];
+                        foreach ($users as $u) {
+                            if ($u['id'] === $user_id) {
+                                $email = $u['email'];
+                                break;
+                            }
+                        }
+                    }
+                }
                 
+                $email = $email ?: 'user@zennarafp.com';
+                $result = $totp->enable2FA($user_id, $email);
+                
+                if (ob_get_level() > 0) ob_clean();
                 http_response_code(200);
                 echo json_encode([
                     'success' => true,
                     'secret' => $result['secret'],
                     'backup_codes' => $result['backup_codes'],
-                    'qr_code_url' => $result['qr_code_url']
+                    'qr_code_url' => $result['qr_code_url'],
+                    'qr_code_data_uri' => $result['qr_code_url']
                 ]);
             } catch (Exception $e) {
+                if (ob_get_level() > 0) ob_clean();
                 http_response_code(500);
                 echo json_encode(['success' => false, 'error' => $e->getMessage()]);
             }
         } elseif ($action === 'verify_setup') {
             if (!$user_id || !isset($input['code'])) {
+                if (ob_get_level() > 0) ob_clean();
                 http_response_code(400);
                 echo json_encode(['success' => false, 'error' => 'Missing parameters']);
                 exit;
@@ -427,6 +447,7 @@ if (isset($_SERVER['SCRIPT_FILENAME']) && realpath(__FILE__) === realpath($_SERV
             
             $verified = $totp->verify2FA($user_id, $input['code']);
             
+            if (ob_get_level() > 0) ob_clean();
             http_response_code($verified ? 200 : 401);
             echo json_encode([
                 'success' => $verified,
@@ -434,6 +455,7 @@ if (isset($_SERVER['SCRIPT_FILENAME']) && realpath(__FILE__) === realpath($_SERV
             ]);
         } elseif ($action === 'verify_code') {
             if (!$user_id || !isset($input['code'])) {
+                if (ob_get_level() > 0) ob_clean();
                 http_response_code(400);
                 echo json_encode(['success' => false, 'error' => 'Missing parameters']);
                 exit;
@@ -441,6 +463,7 @@ if (isset($_SERVER['SCRIPT_FILENAME']) && realpath(__FILE__) === realpath($_SERV
             
             $verified = $totp->verify2FACode($user_id, $input['code']);
             
+            if (ob_get_level() > 0) ob_clean();
             http_response_code($verified ? 200 : 401);
             echo json_encode([
                 'success' => $verified,
@@ -448,6 +471,7 @@ if (isset($_SERVER['SCRIPT_FILENAME']) && realpath(__FILE__) === realpath($_SERV
             ]);
         } elseif ($action === 'disable') {
             if (!$user_id) {
+                if (ob_get_level() > 0) ob_clean();
                 http_response_code(400);
                 echo json_encode(['success' => false, 'error' => 'Missing user_id']);
                 exit;
@@ -455,6 +479,7 @@ if (isset($_SERVER['SCRIPT_FILENAME']) && realpath(__FILE__) === realpath($_SERV
             
             $disabled = $totp->disable2FA($user_id, null);
             
+            if (ob_get_level() > 0) ob_clean();
             http_response_code($disabled ? 200 : 400);
             echo json_encode([
                 'success' => $disabled,
@@ -462,6 +487,7 @@ if (isset($_SERVER['SCRIPT_FILENAME']) && realpath(__FILE__) === realpath($_SERV
             ]);
         } elseif ($action === 'status') {
             if (!$user_id) {
+                if (ob_get_level() > 0) ob_clean();
                 http_response_code(400);
                 echo json_encode(['success' => false, 'error' => 'Missing user_id']);
                 exit;
@@ -470,10 +496,13 @@ if (isset($_SERVER['SCRIPT_FILENAME']) && realpath(__FILE__) === realpath($_SERV
             $enabled = $totp->is2FAEnabled($user_id);
             $backup_count = $totp->getBackupCodesCount($user_id);
             
+            if (ob_get_level() > 0) ob_clean();
             http_response_code(200);
             echo json_encode([
                 'success' => true,
                 'enabled' => $enabled,
+                'is_enabled' => $enabled,
+                'backup_codes_count' => $backup_count,
                 'backup_codes_remaining' => $backup_count
             ]);
         } elseif ($action === 'regenerate_backup') {

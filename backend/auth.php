@@ -466,6 +466,7 @@ class AuthHandler {
             $users = $this->loadUsers();
             $updated = false;
             
+            $updated_user = null;
             foreach ($users as &$user) {
                 if ($user['id'] === $user_id) {
                     if (isset($data['name']) && !empty($data['name'])) {
@@ -489,11 +490,13 @@ class AuthHandler {
                     
                     $user['updated_at'] = date('Y-m-d H:i:s');
                     $updated = true;
+                    $updated_user = $user;
                     break;
                 }
             }
+            unset($user);
             
-            if (!$updated) {
+            if (!$updated || !$updated_user) {
                 return $this->error('User not found', 404);
             }
             
@@ -501,25 +504,21 @@ class AuthHandler {
             
             $this->log("Profile updated for user: {$user_id}");
             
-            // Return updated user
-            foreach ($users as $user) {
-                if ($user['id'] === $user_id) {
-                    http_response_code(200);
-                    echo json_encode([
-                        'success' => true,
-                        'message' => 'Profile updated successfully',
-                        'user' => [
-                            'id' => $user['id'],
-                            'email' => $user['email'],
-                            'name' => $user['name'],
-                            'type' => $user['type'],
-                            'phone' => $user['phone'],
-                            'company' => $user['company']
-                        ]
-                    ]);
-                    return;
-                }
-            }
+            if (ob_get_level() > 0) ob_clean();
+            http_response_code(200);
+            echo json_encode([
+                'success' => true,
+                'message' => 'Profile updated successfully',
+                'user' => [
+                    'id' => $updated_user['id'],
+                    'email' => $updated_user['email'],
+                    'name' => $updated_user['name'],
+                    'type' => $updated_user['type'],
+                    'phone' => $updated_user['phone'],
+                    'company' => $updated_user['company']
+                ]
+            ]);
+            return;
             
         } catch (Exception $e) {
             $this->log('Profile update error: ' . $e->getMessage());
@@ -697,53 +696,65 @@ class AuthHandler {
     }
 }
 
-// Handle API requests
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $input = json_decode(file_get_contents('php://input'), true);
-    $action = $input['action'] ?? null;
-    
-    $auth = new AuthHandler();
-    
-    if ($action === 'register') {
-        $auth->register(
-            $input['email'] ?? '',
-            $input['password'] ?? '',
-            $input['name'] ?? '',
-            $input['type'] ?? 'client'
-        );
-    } elseif ($action === 'login') {
-        $auth->login(
-            $input['email'] ?? '',
-            $input['password'] ?? ''
-        );
-    } elseif ($action === 'verify_2fa') {
-        $auth->verify2FA(
-            $input['temp_token'] ?? '',
-            $input['code'] ?? ''
-        );
-    } elseif ($action === 'verify_session') {
-        $result = $auth->verifySession($input['token'] ?? '');
-        if (is_array($result) && isset($result['success'])) {
-            http_response_code(200);
-            echo json_encode($result);
-        }
-    } elseif ($action === 'logout') {
-        $auth->logout($input['token'] ?? '');
-    } elseif ($action === 'request_password_reset') {
-        $auth->requestPasswordReset($input['email'] ?? '');
-    } elseif ($action === 'reset_password') {
-        $auth->resetPassword($input['token'] ?? '', $input['password'] ?? '');
-    } elseif ($action === 'update_profile') {
-        $auth->updateProfile($input['token'] ?? '', $input['data'] ?? []);
-    } elseif ($action === 'get_profile') {
-        $auth->getProfile($input['token'] ?? '');
-    } else {
-        http_response_code(400);
-        echo json_encode(['success' => false, 'error' => 'Invalid action']);
+// Handle API requests only when executed directly
+if (isset($_SERVER['SCRIPT_FILENAME']) && realpath(__FILE__) === realpath($_SERVER['SCRIPT_FILENAME'])) {
+    if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+        if (ob_get_level() > 0) ob_clean();
+        http_response_code(200);
+        exit();
     }
-} else {
-    http_response_code(405);
-    echo json_encode(['success' => false, 'error' => 'Method not allowed']);
+
+    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        $input = json_decode(file_get_contents('php://input'), true) ?? [];
+        $action = $input['action'] ?? null;
+        
+        $auth = new AuthHandler();
+        
+        if ($action === 'register') {
+            $auth->register(
+                $input['email'] ?? '',
+                $input['password'] ?? '',
+                $input['name'] ?? '',
+                $input['type'] ?? 'client'
+            );
+        } elseif ($action === 'login') {
+            $auth->login(
+                $input['email'] ?? '',
+                $input['password'] ?? ''
+            );
+        } elseif ($action === 'verify_2fa') {
+            $auth->verify2FA(
+                $input['temp_token'] ?? '',
+                $input['code'] ?? ''
+            );
+        } elseif ($action === 'verify_session') {
+            $result = $auth->verifySession($input['token'] ?? '');
+            if (is_array($result) && isset($result['success'])) {
+                if (ob_get_level() > 0) ob_clean();
+                http_response_code(200);
+                echo json_encode($result);
+            }
+        } elseif ($action === 'logout') {
+            $auth->logout($input['token'] ?? '');
+        } elseif ($action === 'request_password_reset') {
+            $auth->requestPasswordReset($input['email'] ?? '');
+        } elseif ($action === 'reset_password') {
+            $auth->resetPassword($input['token'] ?? '', $input['password'] ?? '');
+        } elseif ($action === 'update_profile') {
+            $auth->updateProfile($input['token'] ?? '', $input['data'] ?? []);
+        } elseif ($action === 'get_profile') {
+            $auth->getProfile($input['token'] ?? '');
+        } else {
+            if (ob_get_level() > 0) ob_clean();
+            http_response_code(400);
+            echo json_encode(['success' => false, 'error' => 'Invalid action']);
+        }
+    } else {
+        if (ob_get_level() > 0) ob_clean();
+        http_response_code(405);
+        echo json_encode(['success' => false, 'error' => 'Method not allowed']);
+    }
+    exit();
 }
 
 ?>

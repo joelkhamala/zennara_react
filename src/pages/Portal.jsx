@@ -66,6 +66,9 @@ export default function Portal() {
       if (data.success) {
         setAuthToken(token)
         setUserData(data.user)
+        if (data.user.type) {
+          setActiveTab(data.user.type)
+        }
         setIsAuthenticated(true)
         setFormData(prev => ({
           ...prev,
@@ -165,6 +168,9 @@ export default function Portal() {
             localStorage.setItem('auth_token', responseData.token)
             setAuthToken(responseData.token)
             setUserData(responseData.user)
+            if (responseData.user?.type) {
+              setActiveTab(responseData.user.type)
+            }
             setIsAuthenticated(true)
             setFormData(prev => ({ ...prev, password: '' }))
             setMessage('Login successful!')
@@ -735,6 +741,52 @@ export default function Portal() {
                         <h4>2FA Status</h4>
                         <p>{is2FAEnabled ? '✓ Enabled' : '✗ Disabled'}</p>
                       </div>
+                    </div>
+                  </div>
+
+                  <div style={{ marginTop: '24px' }}>
+                    <h4 style={{ marginBottom: '12px', color: '#C9A030' }}>Quick Actions</h4>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '12px' }}>
+                      {userData?.type === 'admin' ? (
+                        <>
+                          <a href="/backend/admin.php" target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'none' }}>
+                            <Button variant="gold" size="medium" style={{ width: '100%' }}>
+                              📊 Admin Console & Leads
+                            </Button>
+                          </a>
+                          <a href="/backend/logs.php" target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'none' }}>
+                            <Button variant="secondary" size="medium" style={{ width: '100%' }}>
+                              🔍 Live System Logs
+                            </Button>
+                          </a>
+                        </>
+                      ) : userData?.type === 'landlord' ? (
+                        <>
+                          <a href="/securerent" style={{ textDecoration: 'none' }}>
+                            <Button variant="gold" size="medium" style={{ width: '100%' }}>
+                              🛡️ SecureRent Yield
+                            </Button>
+                          </a>
+                          <a href="/facility-management" style={{ textDecoration: 'none' }}>
+                            <Button variant="secondary" size="medium" style={{ width: '100%' }}>
+                              🏢 Facility Management
+                            </Button>
+                          </a>
+                        </>
+                      ) : (
+                        <>
+                          <a href="/properties" style={{ textDecoration: 'none' }}>
+                            <Button variant="gold" size="medium" style={{ width: '100%' }}>
+                              🏡 Browse Properties
+                            </Button>
+                          </a>
+                          <a href="/contact" style={{ textDecoration: 'none' }}>
+                            <Button variant="secondary" size="medium" style={{ width: '100%' }}>
+                              ✉️ Request Consultation
+                            </Button>
+                          </a>
+                        </>
+                      )}
                     </div>
                   </div>
                 </div>

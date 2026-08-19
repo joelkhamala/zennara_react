@@ -37,14 +37,14 @@ class Mailer {
     /**
      * Send email
      */
-    public function send($to, $subject, $body, $from = null) {
+    public function send($to, $subject, $body, $from = null, $reply_to = null) {
         try {
             if ($this->use_phpmailer && $this->mail) {
-                return $this->sendWithPHPMailer($to, $subject, $body, $from);
+                return $this->sendWithPHPMailer($to, $subject, $body, $from, $reply_to);
             } elseif (defined('SMTP_USER') && SMTP_USER !== 'your-email@gmail.com' && !empty(SMTP_PASS) && SMTP_PASS !== 'your-app-password') {
-                return $this->sendWithSocketSMTP($to, $subject, $body, $from);
+                return $this->sendWithSocketSMTP($to, $subject, $body, $from, $reply_to);
             } else {
-                return $this->sendWithPHPMail($to, $subject, $body, $from);
+                return $this->sendWithPHPMail($to, $subject, $body, $from, $reply_to);
             }
         } catch (Exception $e) {
             error_log("Mail sending error: " . $e->getMessage());
@@ -56,10 +56,11 @@ class Mailer {
     /**
      * Send email using direct SMTP socket connection (Supports Gmail, Outlook, SendGrid)
      */
-    private function sendWithSocketSMTP($to, $subject, $body, $from = null) {
+    private function sendWithSocketSMTP($to, $subject, $body, $from = null, $reply_to = null) {
         try {
             $from_email = $from ?: (defined('FROM_EMAIL') ? FROM_EMAIL : SMTP_USER);
             $from_name = defined('FROM_NAME') ? FROM_NAME : 'ZENNARA';
+            $reply_email = $reply_to ?: $from_email;
             $user = SMTP_USER;
             $pass = str_replace(' ', '', SMTP_PASS); // Clean any spaces in app passwords
             $host = SMTP_HOST;
@@ -153,7 +154,7 @@ class Mailer {
                 "Subject: =?UTF-8?B?" . base64_encode($subject) . "?=",
                 "MIME-Version: 1.0",
                 "Content-Type: multipart/alternative; boundary=\"{$boundary}\"",
-                "Reply-To: {$from_email}",
+                "Reply-To: {$reply_email}",
                 "X-Mailer: ZENNARA SMTP Engine"
             ];
 

@@ -406,17 +406,22 @@ export default function Home() {
           {destinations.map((destination, index) => (
             <Link 
               key={index} 
-              to={`/property?location=${destination.name.toLowerCase()}`}
+              to={destination.isComingSoon ? `/contact?interest=property-management&location=${encodeURIComponent(destination.name)}` : `/property?location=${encodeURIComponent(destination.name.toLowerCase())}`}
               className={styles.destinationCard}
-              aria-label={`Browse ${destination.properties} properties in ${destination.name}`}
+              aria-label={destination.isComingSoon ? `${destination.name}, ${destination.country} - Regional Expansion (Coming Soon)` : `Browse ${destination.properties} properties in ${destination.name}`}
             >
+              {destination.isComingSoon && (
+                <span className={styles.comingSoonBadge}>
+                  Coming Soon
+                </span>
+              )}
               <div className={styles.destinationImage}>
                 <LazyImage src={destination.img} alt={destination.name} />
                 <div className={styles.destinationOverlay} aria-hidden="true"></div>
               </div>
               <div className={styles.destinationInfo}>
                 <h3>{destination.name}</h3>
-                <p>{destination.properties} properties</p>
+                <p>{destination.isComingSoon ? `${destination.country} · Expansion` : `${destination.properties} properties`}</p>
               </div>
             </Link>
           ))}

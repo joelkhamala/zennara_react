@@ -1,0 +1,38 @@
+[
+    {
+        "id": "user_admin_001",
+        "email": "admin@zennarafp.com",
+        "password": "$2y$10$CGZ76yXh\/6JJHG.DXjqa6eUaehsGDxi2FS6yt\/QNhEobuMzD1Hz56",
+        "name": "Zennara Administrator",
+        "type": "admin",
+        "phone": "+254700000000",
+        "company": "ZENNARA FP",
+        "created_at": "2026-08-19 13:43:36",
+        "updated_at": "2026-08-19 13:43:36",
+        "verified": true
+    },
+    {
+        "id": "user_landlord_001",
+        "email": "landlord@zennarafp.com",
+        "password": "$2y$10$pnbptHS2mp05tbGLstXCN.BbefA08EKFgjymHkxIN3TpErGuYZXj6",
+        "name": "Zennara Landlord",
+        "type": "landlord",
+        "phone": "+254711000000",
+        "company": "Zennara Prime Estates",
+        "created_at": "2026-08-19 13:43:36",
+        "updated_at": "2026-08-19 13:43:36",
+        "verified": true
+    },
+    {
+        "id": "user_client_001",
+        "email": "client@zennarafp.com",
+        "password": "$2y$10$dGisGpC7\/u.vCaRwz8sn\/eYIu2e\/O5BaTAeUvTIUp.WTsPbpmRIKa",
+        "name": "Joel Wanyoa",
+        "type": "client",
+        "phone": "+254729520665",
+        "company": "Zennara Client",
+        "created_at": "2026-08-19 13:43:36",
+        "updated_at": "2026-08-19 13:43:36",
+        "verified": true
+    }
+]

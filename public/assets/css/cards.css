@@ -1,0 +1,141 @@
+/* ===== PROPERTY CARDS ===== */
+.property-card {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  transition: var(--transition);
+  cursor: pointer;
+}
+
+.property-card:hover {
+  transform: translateY(-6px);
+  box-shadow: var(--shadow-lg);
+  border-color: var(--gold);
+}
+
+.property-card-img {
+  height: 260px;
+  position: relative;
+  overflow: hidden;
+}
+
+.property-card-img img {
+  height: 100%;
+  width: 100%;
+  object-fit: cover;
+  transition: var(--transition);
+}
+
+.property-card:hover .property-card-img img {
+  transform: scale(1.06);
+}
+
+.property-tag {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  background: var(--gold);
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  padding: 6px 14px;
+  border-radius: 40px;
+}
+
+.property-tag.eco {
+  background: var(--eco);
+}
+
+.property-tag.new {
+  background: var(--gold-dark);
+}
+
+.property-save {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  width: 40px;
+  height: 40px;
+  background: rgba(255, 255, 255, 0.95);
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-size: 20px;
+  color: var(--grey);
+  transition: var(--transition);
+  cursor: pointer;
+}
+
+.property-save:hover {
+  background: var(--white);
+  color: var(--gold);
+  transform: scale(1.1);
+}
+
+.property-save.saved {
+  color: var(--gold);
+  background: var(--white);
+  border-color: var(--gold);
+}
+
+.property-card-body {
+  padding: 24px;
+}
+
+.property-card-body .location {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--gold);
+}
+
+.property-card-body h3 {
+  font-size: 22px;
+  font-weight: 600;
+  margin: 6px 0 8px;
+}
+
+.property-card-body .details {
+  font-size: 13px;
+  color: var(--grey);
+  margin-bottom: 12px;
+}
+
+.property-card-body .price {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--black);
+}
+
+.property-card-body .features {
+  display: flex;
+  gap: 16px;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border);
+  font-size: 12px;
+  color: var(--grey);
+}
+
+/* Property Grid */
+.property-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+}
+
+@media (max-width: 1024px) {
+  .property-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .property-grid {
+    grid-template-columns: 1fr;
+  }
+}

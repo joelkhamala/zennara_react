@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 114" width="100" height="114">
+  <title>ZENNARA Z-Prism Icon</title>
+  <!-- Top bar (light green) with fold shade -->
+  <polygon points="0,0 100,0 100,26 0,26" fill="#187D41"/>
+  <polygon points="0,0 62,0 0,26" fill="#13562B" opacity="0.85"/>
+  <!-- Diagonal (mid green) -->
+  <polygon points="72,26 100,26 28,88 0,88" fill="#166535"/>
+  <!-- Bottom bar (dark green) -->
+  <polygon points="0,88 100,88 100,114 0,114" fill="#13562B"/>
+  <polygon points="40,114 100,88 100,114" fill="#0F4A24" opacity="0.9"/>
+</svg>

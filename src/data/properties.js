@@ -224,62 +224,86 @@ export const properties = [
 export const destinations = [
   {
     name: 'Nairobi',
+    country: 'Kenya',
+    isComingSoon: false,
     properties: 127,
     img: 'https://images.unsplash.com/photo-1611348524140-53c9a25263d6?w=600&q=80'
   },
   {
     name: 'Mombasa',
+    country: 'Kenya',
+    isComingSoon: false,
     properties: 64,
     img: 'https://images.unsplash.com/photo-1505142468610-359e7d316be0?w=600&q=80'
   },
   {
     name: 'Nakuru',
+    country: 'Kenya',
+    isComingSoon: false,
     properties: 28,
     img: 'https://images.unsplash.com/photo-1564760055775-d63b17a55c44?w=600&q=80'
   },
   {
     name: 'Nanyuki',
+    country: 'Kenya',
+    isComingSoon: false,
     properties: 15,
     img: 'https://images.unsplash.com/photo-1523805009345-7448845a9e53?w=600&q=80'
   },
   {
     name: 'Kisumu',
+    country: 'Kenya',
+    isComingSoon: false,
     properties: 42,
     img: 'https://images.unsplash.com/photo-1547471080-7cc2caa01a7e?w=600&q=80'
   },
   {
     name: 'Dar es Salaam',
-    properties: 89,
+    country: 'Tanzania',
+    isComingSoon: true,
+    properties: 0,
     img: 'https://images.unsplash.com/photo-1568632234157-ce7aecd03d0d?w=600&q=80'
   },
   {
     name: 'Kigali',
-    properties: 56,
+    country: 'Rwanda',
+    isComingSoon: true,
+    properties: 0,
     img: 'https://images.unsplash.com/photo-1609137144813-7d9921338f24?w=600&q=80'
   },
   {
     name: 'Kampala',
-    properties: 73,
+    country: 'Uganda',
+    isComingSoon: true,
+    properties: 0,
     img: 'https://images.unsplash.com/photo-1611348586804-61bf6c080437?w=600&q=80'
   },
   {
     name: 'Arusha',
-    properties: 31,
+    country: 'Tanzania',
+    isComingSoon: true,
+    properties: 0,
     img: 'https://images.unsplash.com/photo-1516026672322-bc52d61a55d5?w=600&q=80'
   },
   {
     name: 'Zanzibar',
-    properties: 38,
+    country: 'Tanzania',
+    isComingSoon: true,
+    properties: 0,
     img: 'https://images.unsplash.com/photo-1568322445389-f64ac2515020?w=600&q=80'
   },
   {
     name: 'Eldoret',
+    country: 'Kenya',
+    isComingSoon: false,
     properties: 24,
     img: 'https://images.unsplash.com/photo-1580587771525-78b9dba3b914?w=600&q=80'
   },
   {
     name: 'Mwanza',
-    properties: 19,
+    country: 'Tanzania',
+    isComingSoon: true,
+    properties: 0,
     img: 'https://images.unsplash.com/photo-1547471080-7cc2caa01a7e?w=600&q=80'
   }
 ];
