@@ -64,7 +64,7 @@ export default function Contact() {
     setSubmitError('')
     
     try {
-      const method = formData.phone ? 'sms' : 'email'
+      const method = formData.phone ? 'both' : 'email'
       
       const response = await fetch(`${API_URL}/submit.php`, {
         method: 'POST',
@@ -82,7 +82,7 @@ export default function Contact() {
       const data = await response.json()
 
       if (data.success) {
-        setOtpMethod(method)
+        setOtpMethod(data.data?.method || method)
         setOtpSessionId(data.data.session_id)
         setOtpSent(true)
         setOtpStep(true)
@@ -98,7 +98,7 @@ export default function Contact() {
     }
   }
 
-  // Verify OTP
+  // Verify OTP & Submit Form in 1 instant call
   const handleOtpSubmit = async (e) => {
     e.preventDefault()
     
@@ -117,18 +117,40 @@ export default function Contact() {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          action: 'verify_otp',
+          action: 'verify_and_submit',
           session_id: otpSessionId,
-          otp_code: otpCode
+          otp_code: otpCode,
+          name: formData.name,
+          email: formData.email,
+          phone: formData.phone,
+          interest: formData.interest,
+          message: formData.message
         })
       })
 
       const data = await response.json()
 
       if (data.success) {
-        console.log('✅ OTP verified successfully')
-        // Submit form with verified OTP
-        await handleFormSubmitWithOTP(data.data.session_id)
+        console.log('✅ Form verified & submitted successfully')
+        setSuccessMessage('Your message has been received! We will contact you within 24 hours.')
+        setIsSuccess(true)
+        setOtpStep(false)
+        
+        // Reset form after 3 seconds
+        setTimeout(() => {
+          setFormData({
+            name: '',
+            email: '',
+            phone: '',
+            interest: 'property-management',
+            message: ''
+          })
+          setOtpCode('')
+          setOtpError('')
+          setIsSuccess(false)
+          setSuccessMessage('')
+          setOtpSessionId('')
+        }, 3000)
       } else {
         setOtpError(data.error || 'Invalid OTP. Please try again.')
       }
@@ -294,8 +316,22 @@ export default function Contact() {
             ) : otpStep ? (
               <form className={styles.otpForm} onSubmit={handleOtpSubmit}>
                 <div className={styles.otpHeader}>
-                  <h4>Verify your {otpMethod === 'email' ? 'email' : 'phone number'}</h4>
-                  <p>We've sent a 6-digit verification code to <strong>{otpMethod === 'email' ? formData.email : formData.phone}</strong></p>
+                  <h4>
+                    {otpMethod === 'both'
+                      ? 'Verify your contact details'
+                      : otpMethod === 'sms'
+                        ? 'Verify your phone number'
+                        : 'Verify your email'}
+                  </h4>
+                  <p>
+                    {otpMethod === 'both' ? (
+                      <>We've sent a 6-digit verification code to <strong>{formData.email}</strong> and <strong>{formData.phone}</strong></>
+                    ) : otpMethod === 'sms' ? (
+                      <>We've sent a 6-digit verification code to <strong>{formData.phone}</strong></>
+                    ) : (
+                      <>We've sent a 6-digit verification code to <strong>{formData.email}</strong></>
+                    )}
+                  </p>
                 </div>
 
                 <div className={styles.otpInputGroup}>

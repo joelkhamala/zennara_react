@@ -4,6 +4,10 @@
  * Secure configuration for OTP and form processing
  */
 
+// Disable HTML error display in API output and buffer everything
+ini_set('display_errors', '0');
+error_reporting(E_ALL & ~E_NOTICE & ~E_WARNING & ~E_DEPRECATED);
+
 // Start output buffering to prevent any stray output
 ob_start();
 
@@ -11,24 +15,62 @@ ob_start();
 header('Content-Type: application/json; charset=utf-8');
 header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Methods: POST, GET, OPTIONS');
-header('Access-Control-Allow-Headers: Content-Type');
+header('Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With');
+
+// Handle OPTIONS preflight requests globally
+if (isset($_SERVER['REQUEST_METHOD']) && $_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+    if (ob_get_level() > 0) ob_clean();
+    http_response_code(200);
+    exit();
+}
 
 // Environment Variables
 define('PROJECT_ROOT', dirname(__DIR__));
 define('DATA_DIR', PROJECT_ROOT . '/data');
 define('LOGS_DIR', PROJECT_ROOT . '/logs');
 
+// Load environment variables from .env or .env.backend if present
+$env_files = [PROJECT_ROOT . '/.env', PROJECT_ROOT . '/.env.backend', __DIR__ . '/.env'];
+foreach ($env_files as $env_path) {
+    if (file_exists($env_path) && is_readable($env_path)) {
+        $lines = file($env_path, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+        foreach ($lines as $line) {
+            $line = trim($line);
+            if (empty($line) || $line[0] === '#') continue;
+            if (strpos($line, '=') !== false) {
+                list($env_k, $env_v) = explode('=', $line, 2);
+                $env_k = trim($env_k);
+                $env_v = trim(trim($env_v), "\"'");
+                if (!empty($env_k)) {
+                    putenv("{$env_k}={$env_v}");
+                    $_ENV[$env_k] = $env_v;
+                    $_SERVER[$env_k] = $env_v;
+                }
+            }
+        }
+        break;
+    }
+}
+
 // Email Configuration
 define('SMTP_HOST', getenv('SMTP_HOST') ?: 'smtp.gmail.com');
 define('SMTP_PORT', getenv('SMTP_PORT') ?: 587);
 define('SMTP_USER', getenv('SMTP_USER') ?: 'your-email@gmail.com');
 define('SMTP_PASS', getenv('SMTP_PASS') ?: 'your-app-password');
-define('FROM_EMAIL', getenv('FROM_EMAIL') ?: 'noreply@zennarafp.com');
-define('FROM_NAME', 'ZENNARA Contact Form');
+define('FROM_EMAIL', getenv('FROM_EMAIL') ?: 'info@zennarafp.com');
+define('FROM_NAME', getenv('FROM_NAME') ?: 'ZENNARA');
+define('TEAM_EMAIL', getenv('TEAM_EMAIL') ?: 'info@zennarafp.com');
 
-// SMS Configuration (Twilio)
+// SMS Configuration (Africa's Talking & Twilio)
+define('SMS_PROVIDER', getenv('SMS_PROVIDER') ?: 'africastalking');
+define('AT_USERNAME', getenv('AT_USERNAME') ?: '');
+define('AT_API_KEY', getenv('AT_API_KEY') ?: '');
+define('AT_SENDER_ID', getenv('AT_SENDER_ID') ?: '');
+
 define('TWILIO_ACCOUNT_SID', getenv('TWILIO_ACCOUNT_SID') ?: '');
 define('TWILIO_AUTH_TOKEN', getenv('TWILIO_AUTH_TOKEN') ?: '');
+define('TWILIO_API_KEY', getenv('TWILIO_API_KEY') ?: '');
+define('TWILIO_API_SECRET', getenv('TWILIO_API_SECRET') ?: '');
 define('TWILIO_FROM_NUMBER', getenv('TWILIO_FROM_NUMBER') ?: '');
 
 // CRM Integration Configuration
@@ -89,12 +131,13 @@ if (!file_exists(CSV_PATH)) {
 }
 
 // Session Configuration
-// Only configure session settings if session hasn't started yet
-if (session_status() === PHP_SESSION_NONE) {
+if (session_status() === PHP_SESSION_NONE && !headers_sent()) {
     ini_set('session.cookie_httponly', 1);
-    ini_set('session.cookie_secure', 1);
+    if (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on') {
+        ini_set('session.cookie_secure', 1);
+    }
     ini_set('session.use_strict_mode', 1);
-    session_start();
+    @session_start();
 }
 
 ?>

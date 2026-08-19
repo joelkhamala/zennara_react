@@ -62,6 +62,13 @@ class ContactFormHandler {
                 return $this->sendOTP($email, $phone);
             } else if ($action === 'verify_otp') {
                 return $this->verifyOTP($session_id, $input['otp_code'] ?? null);
+            } else if ($action === 'verify_and_submit') {
+                $otp_code = $input['otp_code'] ?? null;
+                $verify_res = $this->otp_handler->verifyOTPRaw($session_id, $otp_code);
+                if (!$verify_res['success']) {
+                    return $this->error($verify_res['error'] ?? 'Invalid OTP code', 400);
+                }
+                return $this->submitForm($name, $email, $phone, $interest, $message, $session_id);
             } else if ($action === 'submit_form') {
                 return $this->submitForm($name, $email, $phone, $interest, $message, $session_id);
             } else {
@@ -83,7 +90,7 @@ class ContactFormHandler {
             return $this->error('Email or phone is required', 400);
         }
         
-        $method = $email ? 'email' : 'sms';
+        $method = ($email && $phone) ? 'both' : ($email ? 'email' : 'sms');
         
         // Validate email if provided
         if ($email && !Security::validateEmail($email)) {
@@ -97,6 +104,7 @@ class ContactFormHandler {
         
         // Use OTP handler
         $result = $this->otp_handler->generateAndSendOTP($email, $phone, $method);
+        if (ob_get_level() > 0) ob_clean();
         echo $result;
         exit();
     }
@@ -111,6 +119,7 @@ class ContactFormHandler {
         
         // Use OTP handler
         $result = $this->otp_handler->verifyOTP($session_id, $otp_code);
+        if (ob_get_level() > 0) ob_clean();
         echo $result;
         exit();
     }
@@ -151,9 +160,10 @@ class ContactFormHandler {
                 $sessions = json_decode(file_get_contents($otp_file), true);
                 if (isset($sessions[$session_id]) && $sessions[$session_id]['verified']) {
                     $otp_verified = true;
-                    if ($sessions[$session_id]['method'] === 'email') {
+                    if (!empty($sessions[$session_id]['email'])) {
                         $email_verified = true;
-                    } else if ($sessions[$session_id]['method'] === 'sms') {
+                    }
+                    if (!empty($sessions[$session_id]['phone'])) {
                         $phone_verified = true;
                     }
                 }
@@ -171,59 +181,78 @@ class ContactFormHandler {
             'phone_verified' => $phone_verified
         ];
         
-        // Save to CSV
+        // Save to CSV immediately (< 1ms)
         $result = $this->storage->saveContactSubmission($data);
         
         if ($result['success']) {
-            // Send notifications
-            $notifier = new NotificationHandler();
-            
-            // Send confirmation to user
-            $notifier->sendUserConfirmation($email, $name, $interest, $message);
-            
-            // Send notification to team
-            $submissionData = [
-                'id' => $result['id'],
-                'timestamp' => date('Y-m-d H:i:s'),
-                'name' => $name,
-                'email' => $email,
-                'phone' => $phone,
-                'interest' => $interest,
-                'message' => $message,
-                'email_verified' => $email_verified ? 'Yes' : 'No',
-                'phone_verified' => $phone_verified ? 'Yes' : 'No',
-                'ip_address' => Security::getClientIP()
-            ];
-            $notifier->sendTeamNotification($submissionData);
-            
-            // Sync to CRM (Zapier, HubSpot, Salesforce)
-            if (strtolower(CRM_SYNC_ENABLED) === 'true') {
-                $crm = new CRMHandler();
-                $crm_sync = $crm->syncSubmission($submissionData, $result['id']);
-                
-                if ($crm_sync['success']) {
-                    $this->log('CRM sync initiated for submission: ' . $result['id']);
-                } else {
-                    $this->log('CRM sync failed (queued for retry): ' . $crm_sync['error']);
-                }
-            }
-            
-            http_response_code(200);
-            echo json_encode([
+            $response_payload = json_encode([
                 'success' => true,
                 'id' => $result['id'],
                 'message' => 'Your message has been received. We will contact you shortly.',
                 'otp_verified' => $otp_verified
             ]);
-            
+
+            // Flush response to client immediately for instant UI feedback
+            if (ob_get_level() > 0) ob_clean();
+            http_response_code(200);
+            header('Content-Type: application/json; charset=utf-8');
+            header('Content-Length: ' . strlen($response_payload));
+            header('Connection: close');
+            echo $response_payload;
+
+            if (function_exists('fastcgi_finish_request')) {
+                fastcgi_finish_request();
+            } else {
+                while (ob_get_level() > 0) {
+                    @ob_end_flush();
+                }
+                @flush();
+            }
+
             // Log successful submission
             $this->log('Contact submission successful: ' . $result['id']);
+
+            // Execute notifications and CRM in the background
+            ignore_user_abort(true);
+            @set_time_limit(30);
+
+            try {
+                $notifier = new NotificationHandler();
+                $submissionData = [
+                    'id' => $result['id'],
+                    'timestamp' => date('Y-m-d H:i:s'),
+                    'name' => $name,
+                    'email' => $email,
+                    'phone' => $phone,
+                    'interest' => $interest,
+                    'message' => $message,
+                    'email_verified' => $email_verified ? 'Yes' : 'No',
+                    'phone_verified' => $phone_verified ? 'Yes' : 'No',
+                    'ip_address' => Security::getClientIP()
+                ];
+
+                // Send confirmation to user & team
+                $notifier->sendUserConfirmation($email, $name, $interest, $message);
+                $notifier->sendTeamNotification($submissionData);
+
+                // Sync to CRM if enabled
+                if (strtolower(CRM_SYNC_ENABLED) === 'true') {
+                    $crm = new CRMHandler();
+                    $crm->syncSubmission($submissionData, $result['id']);
+                }
+            } catch (Exception $e) {
+                $this->log('Background notification error: ' . $e->getMessage());
+            }
+
+            exit();
         } else {
+            if (ob_get_level() > 0) ob_clean();
             http_response_code(500);
             echo json_encode([
                 'success' => false,
                 'error' => $result['error']
             ]);
+            exit();
         }
     }
     
@@ -231,8 +260,10 @@ class ContactFormHandler {
      * Response helper
      */
     private function error($message, $code) {
+        if (ob_get_level() > 0) ob_clean();
         http_response_code($code);
         echo json_encode(['success' => false, 'error' => $message]);
+        exit();
     }
     
     /**
@@ -250,6 +281,7 @@ try {
     $handler = new ContactFormHandler();
     $handler->handleSubmit();
 } catch (Exception $e) {
+    if (ob_get_level() > 0) ob_clean();
     http_response_code(500);
     echo json_encode(['success' => false, 'error' => 'Fatal error: ' . $e->getMessage()]);
 }

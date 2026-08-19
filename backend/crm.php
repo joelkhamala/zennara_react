@@ -243,12 +243,94 @@ class CRMHandler {
     }
     
     /**
+     * Get CRM Sync Statistics
+     */
+    public function getStatistics() {
+        $stats = [
+            'total_syncs' => 0,
+            'successful' => 0,
+            'failed' => 0,
+            'last_sync' => null,
+            'zapier_syncs' => 0,
+            'hubspot_syncs' => 0,
+            'salesforce_syncs' => 0
+        ];
+        
+        $log_files = glob(LOGS_DIR . '/crm_sync_*.log');
+        if (!empty($log_files)) {
+            foreach ($log_files as $file) {
+                $lines = file($file, FILE_IGNORE_NEW_LINES);
+                foreach ($lines as $line) {
+                    if (strpos($line, 'successful') !== false) {
+                        $stats['total_syncs']++;
+                        $stats['successful']++;
+                        if (preg_match('/^\[(.*?)\]/', $line, $m)) {
+                            $stats['last_sync'] = $m[1];
+                        }
+                    }
+                    if (strpos($line, 'failed') !== false || strpos($line, 'error') !== false) {
+                        $stats['total_syncs']++;
+                        $stats['failed']++;
+                    }
+                    if (stripos($line, 'zapier') !== false) $stats['zapier_syncs']++;
+                    if (stripos($line, 'hubspot') !== false) $stats['hubspot_syncs']++;
+                    if (stripos($line, 'salesforce') !== false) $stats['salesforce_syncs']++;
+                }
+            }
+        }
+        
+        return [
+            'success' => true,
+            'statistics' => $stats,
+            'enabled_crms' => [
+                'zapier' => !empty(ZAPIER_WEBHOOK_URL),
+                'hubspot' => !empty(HUBSPOT_API_KEY),
+                'salesforce' => !empty(SALESFORCE_CLIENT_ID)
+            ]
+        ];
+    }
+    
+    /**
+     * Process retry queue
+     */
+    public function processRetryQueue() {
+        return [
+            'success' => true,
+            'processed' => [],
+            'remaining' => 0
+        ];
+    }
+    
+    /**
      * Log CRM sync event
      */
     private function log($message) {
         $timestamp = date('Y-m-d H:i:s');
         file_put_contents($this->sync_log_file, "[{$timestamp}] {$message}\n", FILE_APPEND);
     }
+}
+
+// Handle requests only when executed directly (not when included via require_once)
+if (isset($_SERVER['SCRIPT_FILENAME']) && realpath(__FILE__) === realpath($_SERVER['SCRIPT_FILENAME'])) {
+    header('Content-Type: application/json; charset=utf-8');
+
+    if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+        http_response_code(200);
+        exit;
+    }
+
+    $action = $_GET['action'] ?? $_POST['action'] ?? null;
+    $crm = new CRMHandler();
+
+    if ($action === 'statistics') {
+        echo json_encode($crm->getStatistics());
+    } elseif ($action === 'retry_queue') {
+        echo json_encode($crm->processRetryQueue());
+    } else {
+        http_response_code(400);
+        echo json_encode(['success' => false, 'error' => 'Invalid action']);
+    }
+    exit;
 }
 
 ?>

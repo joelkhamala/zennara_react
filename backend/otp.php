@@ -20,7 +20,7 @@ class OTPHandler {
     /**
      * Generate and send OTP
      */
-    public function generateAndSendOTP($email = null, $phone = null, $method = 'email') {
+    public function generateAndSendOTP($email = null, $phone = null, $method = 'both') {
         try {
             // Validate input
             if (!$email && !$phone) {
@@ -36,13 +36,15 @@ class OTPHandler {
             $otp = str_pad(random_int(0, 999999), OTP_LENGTH, '0', STR_PAD_LEFT);
             $session_id = bin2hex(random_bytes(16));
             
+            $resolved_method = ($email && $phone) ? 'both' : ($email ? 'email' : 'sms');
+
             // Store OTP with expiry
             $otp_data = [
                 'session_id' => $session_id,
                 'otp_hash' => password_hash($otp, PASSWORD_BCRYPT),
                 'email' => $email,
                 'phone' => $phone,
-                'method' => $method,
+                'method' => $resolved_method,
                 'created_at' => time(),
                 'expires_at' => time() + (OTP_EXPIRY_MINUTES * 60),
                 'attempts' => 0,
@@ -50,26 +52,42 @@ class OTPHandler {
             ];
             
             $this->saveOTPSession($session_id, $otp_data);
+            $this->log("Generated OTP for " . trim(($email ?? '') . ' ' . ($phone ?? '')) . ": {$otp} (session: {$session_id})");
             
-            // Send OTP
-            if ($method === 'email' && $email) {
-                $sent = $this->sendOTPEmail($email, $otp);
-            } else if ($method === 'sms' && $phone) {
-                $sent = $this->sendOTPSMS($phone, $otp);
+            // Send OTP to email and/or SMS
+            $sent_email = false;
+            $sent_sms = false;
+
+            if ($email && $method !== 'sms') {
+                $sent_email = $this->sendOTPEmail($email, $otp);
+            }
+            if ($phone && $method !== 'email') {
+                $sent_sms = $this->sendOTPSMS($phone, $otp);
+            }
+
+            if ($method === 'email') {
+                $sent = $sent_email;
+            } else if ($method === 'sms') {
+                $sent = $sent_sms;
             } else {
-                return json_encode(['success' => false, 'error' => 'Invalid OTP method']);
+                // For 'both', succeed if at least one was delivered successfully
+                $sent = ($sent_email || $sent_sms);
             }
             
             if (!$sent) {
                 return json_encode(['success' => false, 'error' => 'Failed to send OTP. Please try again.']);
             }
             
+            $destinations = [];
+            if ($email && $method !== 'sms') $destinations[] = $email;
+            if ($phone && $method !== 'email') $destinations[] = $phone;
+
             return json_encode([
                 'success' => true,
                 'data' => [
                     'session_id' => $session_id,
-                    'method' => $method,
-                    'message' => "OTP sent to " . ($method === 'email' ? $email : $phone)
+                    'method' => $resolved_method,
+                    'message' => "OTP sent to " . implode(' and ', $destinations)
                 ]
             ]);
             
@@ -134,59 +152,227 @@ class OTPHandler {
     }
     
     /**
+     * Programmatic OTP Verification (Returns boolean / array)
+     */
+    public function verifyOTPRaw($session_id, $otp_code) {
+        try {
+            if (!$session_id || !$otp_code) {
+                return ['success' => false, 'error' => 'Session ID and OTP code are required'];
+            }
+            
+            $otp_data = $this->getOTPSession($session_id);
+            if (!$otp_data) {
+                return ['success' => false, 'error' => 'Invalid or expired session'];
+            }
+            
+            if (time() > $otp_data['expires_at']) {
+                $this->deleteOTPSession($session_id);
+                return ['success' => false, 'error' => 'OTP has expired'];
+            }
+            
+            if ($otp_data['attempts'] >= MAX_ATTEMPTS) {
+                $this->deleteOTPSession($session_id);
+                return ['success' => false, 'error' => 'Maximum OTP verification attempts exceeded'];
+            }
+            
+            $otp_data['attempts']++;
+            
+            if (!password_verify($otp_code, $otp_data['otp_hash'])) {
+                $this->saveOTPSession($session_id, $otp_data);
+                return ['success' => false, 'error' => 'Invalid OTP code'];
+            }
+            
+            $otp_data['verified'] = true;
+            $otp_data['verified_at'] = time();
+            $this->saveOTPSession($session_id, $otp_data);
+            
+            return ['success' => true, 'data' => $otp_data];
+        } catch (Exception $e) {
+            return ['success' => false, 'error' => $e->getMessage()];
+        }
+    }
+    
+    /**
      * Send OTP via Email
      */
     private function sendOTPEmail($email, $otp) {
         $mailer = new Mailer();
         
-        $subject = 'Your ZENNARA Verification Code';
+        $subject = 'ZENNARA - Your Email Verification Code';
         $body = "
-        <h2>Verify Your Email</h2>
-        <p>Your verification code is:</p>
-        <h1 style='letter-spacing: 2px; font-family: monospace; background: #f0f0f0; padding: 20px; border-radius: 8px;'>
-            {$otp}
-        </h1>
-        <p>This code expires in " . OTP_EXPIRY_MINUTES . " minutes.</p>
-        <p>If you didn't request this code, please ignore this email.</p>
+        <div style=\"font-family: 'Inter', Arial, sans-serif; color: #1C1C1C; line-height: 1.6;\">
+            <h2 style=\"color: #080808; margin-top: 0;\">Verify Your Email Address</h2>
+            <p style=\"color: #4A4A4A; font-size: 15px;\">Thank you for reaching out to ZENNARA. Please use the following 6-digit verification code to complete your proposal request:</p>
+            <div style=\"text-align: center; margin: 25px 0;\">
+                <div style=\"display: inline-block; letter-spacing: 6px; font-family: 'Courier New', monospace; font-size: 32px; font-weight: bold; background: #FAF7F2; color: #080808; border: 2px solid #C9A030; padding: 16px 32px; border-radius: 8px;\">
+                    {$otp}
+                </div>
+            </div>
+            <p style=\"color: #666; font-size: 13px;\">This verification code is valid for <strong>" . OTP_EXPIRY_MINUTES . " minutes</strong>.</p>
+            <p style=\"color: #999; font-size: 12px; margin-bottom: 0;\">If you did not request this verification code, please ignore this email.</p>
+        </div>
         ";
         
         return $mailer->send($email, $subject, $body);
     }
     
     /**
-     * Send OTP via SMS (Twilio)
+     * Send OTP via SMS (Africa's Talking or Twilio)
      */
     private function sendOTPSMS($phone, $otp) {
-        if (!TWILIO_ACCOUNT_SID || !TWILIO_AUTH_TOKEN) {
+        $provider = defined('SMS_PROVIDER') ? strtolower(SMS_PROVIDER) : 'africastalking';
+
+        if ($provider === 'africastalking' || (!empty(AT_API_KEY) && !empty(AT_USERNAME))) {
+            return $this->sendAfricasTalkingSMS($phone, $otp);
+        } else {
+            return $this->sendTwilioSMS($phone, $otp);
+        }
+    }
+
+    /**
+     * Send SMS via Africa's Talking
+     */
+    private function sendAfricasTalkingSMS($phone, $otp) {
+        $username = defined('AT_USERNAME') ? AT_USERNAME : '';
+        $apiKey = defined('AT_API_KEY') ? AT_API_KEY : '';
+        $senderId = defined('AT_SENDER_ID') ? AT_SENDER_ID : '';
+
+        if (empty($username) || empty($apiKey)) {
+            $this->log("Africa's Talking credentials not configured");
+            return false;
+        }
+
+        try {
+            // Clean and format phone number to E.164 (+254...)
+            $clean_phone = preg_replace('/[^0-9+]/', '', $phone);
+            if (strpos($clean_phone, '0') === 0 && strlen($clean_phone) === 10) {
+                $clean_phone = '+254' . substr($clean_phone, 1);
+            } elseif (strpos($clean_phone, '254') === 0) {
+                $clean_phone = '+' . $clean_phone;
+            } elseif (strpos($clean_phone, '+') !== 0) {
+                $clean_phone = '+' . $clean_phone;
+            }
+
+            $is_sandbox = (strtolower($username) === 'sandbox');
+            $url = $is_sandbox
+                ? "https://api.sandbox.africastalking.com/version1/messaging"
+                : "https://api.africastalking.com/version1/messaging";
+
+            $post_data = [
+                'username' => $username,
+                'to' => $clean_phone,
+                'message' => "Your ZENNARA verification code is: {$otp}. Valid for " . OTP_EXPIRY_MINUTES . " minutes."
+            ];
+
+            if (!empty($senderId)) {
+                $post_data['from'] = $senderId;
+            }
+
+            $ch = curl_init($url);
+            curl_setopt($ch, CURLOPT_POST, true);
+            curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($post_data));
+            curl_setopt($ch, CURLOPT_HTTPHEADER, [
+                "apiKey: {$apiKey}",
+                "Accept: application/json",
+                "Content-Type: application/x-www-form-urlencoded"
+            ]);
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch, CURLOPT_TIMEOUT, 15);
+
+            $response = curl_exec($ch);
+            $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+            $err = curl_error($ch);
+            curl_close($ch);
+
+            $data = json_decode($response, true);
+            $recipients = $data['SMSMessageData']['Recipients'] ?? [];
+            $success = false;
+
+            if (!empty($recipients)) {
+                foreach ($recipients as $recipient) {
+                    if (isset($recipient['statusCode']) && in_array($recipient['statusCode'], [100, 101, 102])) {
+                        $success = true;
+                        $this->log("Africa's Talking SMS sent successfully to {$clean_phone} (Cost: " . ($recipient['cost'] ?? 'N/A') . ")");
+                        break;
+                    } else {
+                        $this->log("Africa's Talking SMS recipient status: " . ($recipient['status'] ?? 'Unknown') . " (Code: " . ($recipient['statusCode'] ?? 'N/A') . ")");
+                    }
+                }
+            } else {
+                $this->log("Africa's Talking SMS failed (HTTP {$http_code}): {$response} {$err}");
+            }
+
+            return $success;
+
+        } catch (Exception $e) {
+            $this->log("Error sending Africa's Talking SMS: " . $e->getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Send OTP via SMS (Twilio)
+     */
+    private function sendTwilioSMS($phone, $otp) {
+        $account_sid = defined('TWILIO_ACCOUNT_SID') ? TWILIO_ACCOUNT_SID : '';
+        if (defined('TWILIO_API_KEY') && strpos(TWILIO_API_KEY, 'SK') === 0 && defined('TWILIO_API_SECRET') && !empty(TWILIO_API_SECRET)) {
+            $auth_user = TWILIO_API_KEY;
+            $auth_pass = TWILIO_API_SECRET;
+        } else {
+            $auth_user = $account_sid;
+            $auth_pass = defined('TWILIO_AUTH_TOKEN') ? TWILIO_AUTH_TOKEN : '';
+        }
+
+        if (empty($account_sid) || empty($auth_pass)) {
             $this->log('Twilio credentials not configured');
             return false;
         }
         
         try {
-            $url = "https://api.twilio.com/2010-04-01/Accounts/" . TWILIO_ACCOUNT_SID . "/Messages.json";
+            // Clean and format phone number to E.164 standard (+254...)
+            $clean_phone = preg_replace('/[^0-9+]/', '', $phone);
+            if (strpos($clean_phone, '0') === 0 && strlen($clean_phone) === 10) {
+                $clean_phone = '+254' . substr($clean_phone, 1);
+            } elseif (strpos($clean_phone, '254') === 0) {
+                $clean_phone = '+' . $clean_phone;
+            } elseif (strpos($clean_phone, '+') !== 0) {
+                $clean_phone = '+' . $clean_phone;
+            }
+
+            $url = "https://api.twilio.com/2010-04-01/Accounts/" . $account_sid . "/Messages.json";
             
             $post_data = [
-                'From' => TWILIO_FROM_NUMBER,
-                'To' => $phone,
+                'To' => $clean_phone,
                 'Body' => "Your ZENNARA verification code is: {$otp}. Valid for " . OTP_EXPIRY_MINUTES . " minutes."
             ];
+            
+            // Check if From is a Twilio phone number or a Messaging Service SID (starts with MG)
+            if (defined('TWILIO_FROM_NUMBER') && !empty(TWILIO_FROM_NUMBER)) {
+                if (strpos(TWILIO_FROM_NUMBER, 'MG') === 0) {
+                    $post_data['MessagingServiceSid'] = TWILIO_FROM_NUMBER;
+                } else {
+                    $post_data['From'] = TWILIO_FROM_NUMBER;
+                }
+            }
             
             $ch = curl_init($url);
             curl_setopt($ch, CURLOPT_POST, true);
             curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($post_data));
-            curl_setopt($ch, CURLOPT_USERPWD, TWILIO_ACCOUNT_SID . ":" . TWILIO_AUTH_TOKEN);
+            curl_setopt($ch, CURLOPT_USERPWD, $auth_user . ":" . $auth_pass);
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
             curl_setopt($ch, CURLOPT_TIMEOUT, 10);
             
             $response = curl_exec($ch);
             $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+            $err = curl_error($ch);
             curl_close($ch);
             
             if ($http_code !== 201) {
-                $this->log('Twilio SMS failed: ' . $response);
+                $this->log('Twilio SMS failed (HTTP ' . $http_code . '): ' . $response . ' ' . $err);
                 return false;
             }
             
+            $this->log('Twilio SMS sent successfully to ' . $clean_phone);
             return true;
             
         } catch (Exception $e) {
@@ -205,11 +391,11 @@ class OTPHandler {
         
         if (file_exists($rate_file)) {
             $data = json_decode(file_get_contents($rate_file), true);
-            $requests = array_filter($data['requests'], function($time) use ($now, $window) {
+            $requests = array_filter($data['requests'] ?? [], function($time) use ($now, $window) {
                 return ($now - $time) < $window;
             });
             
-            if (count($requests) >= 3) {
+            if (count($requests) >= 10) {
                 return false;
             }
             
@@ -218,7 +404,7 @@ class OTPHandler {
             $requests = [$now];
         }
         
-        file_put_contents($rate_file, json_encode(['requests' => $requests]), LOCK_EX);
+        file_put_contents($rate_file, json_encode(['requests' => array_values($requests)]), LOCK_EX);
         return true;
     }
     
@@ -261,8 +447,8 @@ class OTPHandler {
         $sessions = json_decode(file_get_contents($this->db_file), true);
         $now = time();
         
-        $sessions = array_filter($sessions, function($session) use ($now) {
-            return $session['expires_at'] > $now;
+        $sessions = array_filter($sessions ?: [], function($session) use ($now) {
+            return ($session['expires_at'] ?? 0) > $now;
         });
         
         file_put_contents($this->db_file, json_encode($sessions), LOCK_EX);
@@ -272,11 +458,13 @@ class OTPHandler {
      * Response helpers
      */
     private function success($data, $code = 200) {
+        if (ob_get_level() > 0) ob_clean();
         http_response_code($code);
         return json_encode(['success' => true, 'data' => $data]);
     }
     
     private function error($message, $code = 400) {
+        if (ob_get_level() > 0) ob_clean();
         http_response_code($code);
         return json_encode(['success' => false, 'error' => $message]);
     }
@@ -287,37 +475,45 @@ class OTPHandler {
     }
 }
 
-// Handle requests
-header('Content-Type: application/json');
+// Handle requests only when executed directly (not when included via require_once)
+if (isset($_SERVER['SCRIPT_FILENAME']) && realpath(__FILE__) === realpath($_SERVER['SCRIPT_FILENAME'])) {
+    header('Content-Type: application/json; charset=utf-8');
 
-if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
-    http_response_code(200);
+    if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+        if (ob_get_level() > 0) ob_clean();
+        http_response_code(200);
+        exit();
+    }
+
+    try {
+        $raw_input = json_decode(file_get_contents('php://input'), true) ?? [];
+        $action = $_GET['action'] ?? $_POST['action'] ?? $raw_input['action'] ?? null;
+        $otp_handler = new OTPHandler();
+
+        if ($action === 'send' || $action === 'send_otp') {
+            $email = $_POST['email'] ?? $raw_input['email'] ?? null;
+            $phone = $_POST['phone'] ?? $raw_input['phone'] ?? null;
+            $method = $_POST['method'] ?? $raw_input['method'] ?? 'email';
+            $result = $otp_handler->generateAndSendOTP($email, $phone, $method);
+            if (ob_get_level() > 0) ob_clean();
+            echo $result;
+        } else if ($action === 'verify' || $action === 'verify_otp') {
+            $session_id = $_POST['session_id'] ?? $raw_input['session_id'] ?? null;
+            $otp_code = $_POST['otp_code'] ?? $raw_input['otp_code'] ?? null;
+            $result = $otp_handler->verifyOTP($session_id, $otp_code);
+            if (ob_get_level() > 0) ob_clean();
+            echo $result;
+        } else {
+            if (ob_get_level() > 0) ob_clean();
+            http_response_code(400);
+            echo json_encode(['success' => false, 'error' => 'Invalid action']);
+        }
+    } catch (Exception $e) {
+        if (ob_get_level() > 0) ob_clean();
+        http_response_code(500);
+        echo json_encode(['success' => false, 'error' => 'Fatal error: ' . $e->getMessage()]);
+    }
     exit();
 }
-
-try {
-    $action = $_GET['action'] ?? $_POST['action'] ?? null;
-    $otp_handler = new OTPHandler();
-
-    if ($action === 'send') {
-        $email = $_POST['email'] ?? null;
-        $phone = $_POST['phone'] ?? null;
-        $method = $_POST['method'] ?? 'email';
-        $result = $otp_handler->generateAndSendOTP($email, $phone, $method);
-        echo $result;
-    } else if ($action === 'verify') {
-        $session_id = $_POST['session_id'] ?? null;
-        $otp_code = $_POST['otp_code'] ?? null;
-        $result = $otp_handler->verifyOTP($session_id, $otp_code);
-        echo $result;
-    } else {
-        http_response_code(400);
-        echo json_encode(['success' => false, 'error' => 'Invalid action']);
-    }
-} catch (Exception $e) {
-    http_response_code(500);
-    echo json_encode(['success' => false, 'error' => 'Fatal error: ' . $e->getMessage()]);
-}
-exit();
 
 ?>

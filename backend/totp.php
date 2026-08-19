@@ -381,121 +381,129 @@ class TOTPHandler {
     }
 }
 
-// Handle API requests
-header('Content-Type: application/json; charset=utf-8');
+// Handle API requests only when executed directly (not when included via require_once)
+if (isset($_SERVER['SCRIPT_FILENAME']) && realpath(__FILE__) === realpath($_SERVER['SCRIPT_FILENAME'])) {
+    header('Content-Type: application/json; charset=utf-8');
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $input = json_decode(file_get_contents('php://input'), true);
-    $action = $input['action'] ?? null;
-    $user_id = $input['user_id'] ?? null;
-    
-    $totp = new TOTPHandler();
-    
-    if ($action === 'setup') {
-        try {
-            if (!$user_id || !isset($input['email'])) {
+    if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+        http_response_code(200);
+        exit;
+    }
+
+    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        $input = json_decode(file_get_contents('php://input'), true);
+        $action = $input['action'] ?? null;
+        $user_id = $input['user_id'] ?? null;
+        
+        $totp = new TOTPHandler();
+        
+        if ($action === 'setup') {
+            try {
+                if (!$user_id || !isset($input['email'])) {
+                    http_response_code(400);
+                    echo json_encode(['success' => false, 'error' => 'Missing parameters']);
+                    exit;
+                }
+                
+                $result = $totp->enable2FA($user_id, $input['email']);
+                
+                http_response_code(200);
+                echo json_encode([
+                    'success' => true,
+                    'secret' => $result['secret'],
+                    'backup_codes' => $result['backup_codes'],
+                    'qr_code_url' => $result['qr_code_url']
+                ]);
+            } catch (Exception $e) {
+                http_response_code(500);
+                echo json_encode(['success' => false, 'error' => $e->getMessage()]);
+            }
+        } elseif ($action === 'verify_setup') {
+            if (!$user_id || !isset($input['code'])) {
                 http_response_code(400);
                 echo json_encode(['success' => false, 'error' => 'Missing parameters']);
                 exit;
             }
             
-            $result = $totp->enable2FA($user_id, $input['email']);
+            $verified = $totp->verify2FA($user_id, $input['code']);
+            
+            http_response_code($verified ? 200 : 401);
+            echo json_encode([
+                'success' => $verified,
+                'message' => $verified ? '2FA enabled successfully' : 'Invalid code'
+            ]);
+        } elseif ($action === 'verify_code') {
+            if (!$user_id || !isset($input['code'])) {
+                http_response_code(400);
+                echo json_encode(['success' => false, 'error' => 'Missing parameters']);
+                exit;
+            }
+            
+            $verified = $totp->verify2FACode($user_id, $input['code']);
+            
+            http_response_code($verified ? 200 : 401);
+            echo json_encode([
+                'success' => $verified,
+                'message' => $verified ? '2FA verified' : 'Invalid code'
+            ]);
+        } elseif ($action === 'disable') {
+            if (!$user_id) {
+                http_response_code(400);
+                echo json_encode(['success' => false, 'error' => 'Missing user_id']);
+                exit;
+            }
+            
+            $disabled = $totp->disable2FA($user_id, null);
+            
+            http_response_code($disabled ? 200 : 400);
+            echo json_encode([
+                'success' => $disabled,
+                'message' => $disabled ? '2FA disabled' : 'Failed to disable 2FA'
+            ]);
+        } elseif ($action === 'status') {
+            if (!$user_id) {
+                http_response_code(400);
+                echo json_encode(['success' => false, 'error' => 'Missing user_id']);
+                exit;
+            }
+            
+            $enabled = $totp->is2FAEnabled($user_id);
+            $backup_count = $totp->getBackupCodesCount($user_id);
             
             http_response_code(200);
             echo json_encode([
                 'success' => true,
-                'secret' => $result['secret'],
-                'backup_codes' => $result['backup_codes'],
-                'qr_code_url' => $result['qr_code_url']
+                'enabled' => $enabled,
+                'backup_codes_remaining' => $backup_count
             ]);
-        } catch (Exception $e) {
-            http_response_code(500);
-            echo json_encode(['success' => false, 'error' => $e->getMessage()]);
-        }
-    } elseif ($action === 'verify_setup') {
-        if (!$user_id || !isset($input['code'])) {
-            http_response_code(400);
-            echo json_encode(['success' => false, 'error' => 'Missing parameters']);
-            exit;
-        }
-        
-        $verified = $totp->verify2FA($user_id, $input['code']);
-        
-        http_response_code($verified ? 200 : 401);
-        echo json_encode([
-            'success' => $verified,
-            'message' => $verified ? '2FA enabled successfully' : 'Invalid code'
-        ]);
-    } elseif ($action === 'verify_code') {
-        if (!$user_id || !isset($input['code'])) {
-            http_response_code(400);
-            echo json_encode(['success' => false, 'error' => 'Missing parameters']);
-            exit;
-        }
-        
-        $verified = $totp->verify2FACode($user_id, $input['code']);
-        
-        http_response_code($verified ? 200 : 401);
-        echo json_encode([
-            'success' => $verified,
-            'message' => $verified ? '2FA verified' : 'Invalid code'
-        ]);
-    } elseif ($action === 'disable') {
-        if (!$user_id) {
-            http_response_code(400);
-            echo json_encode(['success' => false, 'error' => 'Missing user_id']);
-            exit;
-        }
-        
-        $disabled = $totp->disable2FA($user_id, null);
-        
-        http_response_code($disabled ? 200 : 400);
-        echo json_encode([
-            'success' => $disabled,
-            'message' => $disabled ? '2FA disabled' : 'Failed to disable 2FA'
-        ]);
-    } elseif ($action === 'status') {
-        if (!$user_id) {
-            http_response_code(400);
-            echo json_encode(['success' => false, 'error' => 'Missing user_id']);
-            exit;
-        }
-        
-        $enabled = $totp->is2FAEnabled($user_id);
-        $backup_count = $totp->getBackupCodesCount($user_id);
-        
-        http_response_code(200);
-        echo json_encode([
-            'success' => true,
-            'enabled' => $enabled,
-            'backup_codes_remaining' => $backup_count
-        ]);
-    } elseif ($action === 'regenerate_backup') {
-        if (!$user_id) {
-            http_response_code(400);
-            echo json_encode(['success' => false, 'error' => 'Missing user_id']);
-            exit;
-        }
-        
-        try {
-            $new_codes = $totp->regenerateBackupCodes($user_id);
+        } elseif ($action === 'regenerate_backup') {
+            if (!$user_id) {
+                http_response_code(400);
+                echo json_encode(['success' => false, 'error' => 'Missing user_id']);
+                exit;
+            }
             
-            http_response_code(200);
-            echo json_encode([
-                'success' => true,
-                'backup_codes' => $new_codes
-            ]);
-        } catch (Exception $e) {
-            http_response_code(500);
-            echo json_encode(['success' => false, 'error' => $e->getMessage()]);
+            try {
+                $new_codes = $totp->regenerateBackupCodes($user_id);
+                
+                http_response_code(200);
+                echo json_encode([
+                    'success' => true,
+                    'backup_codes' => $new_codes
+                ]);
+            } catch (Exception $e) {
+                http_response_code(500);
+                echo json_encode(['success' => false, 'error' => $e->getMessage()]);
+            }
+        } else {
+            http_response_code(400);
+            echo json_encode(['success' => false, 'error' => 'Invalid action']);
         }
     } else {
-        http_response_code(400);
-        echo json_encode(['success' => false, 'error' => 'Invalid action']);
+        http_response_code(405);
+        echo json_encode(['success' => false, 'error' => 'Method not allowed']);
     }
-} else {
-    http_response_code(405);
-    echo json_encode(['success' => false, 'error' => 'Method not allowed']);
+    exit;
 }
 
 ?>

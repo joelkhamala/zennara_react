@@ -378,13 +378,16 @@ class ExportHandler {
     }
 }
 
-// Handle POST requests
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $handler = new ExportHandler();
-    $handler->handle();
-} else {
-    http_response_code(405);
-    echo json_encode(['success' => false, 'error' => 'Method not allowed']);
+// Handle requests only when executed directly (not when included via require_once)
+if (isset($_SERVER['SCRIPT_FILENAME']) && realpath(__FILE__) === realpath($_SERVER['SCRIPT_FILENAME'])) {
+    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        $handler = new ExportHandler();
+        $handler->handle();
+    } else {
+        http_response_code(405);
+        echo json_encode(['success' => false, 'error' => 'Method not allowed']);
+    }
+    exit;
 }
 
 ?>
