@@ -51,7 +51,7 @@ export default function SecureRent() {
     },
     {
       question: 'Can I enroll multiple properties?',
-      answer: 'Yes, many of our landlords enroll multiple properties under SecureRent. Portfolio clients benefit from consolidated reporting and streamlined management across all their assets.'
+      answer: 'Yes, many of our landlords enroll multiple properties under SecureRent. Portfolio landlords and owners benefit from consolidated reporting and streamlined management across all their assets.'
     },
     {
       question: 'How do I get started?',

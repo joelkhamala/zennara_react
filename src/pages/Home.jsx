@@ -300,7 +300,7 @@ export default function Home() {
               operational metrics. Full visibility into your property portfolio.
             </p>
             <Button to="/portal" variant="text">
-              Client Portal →
+              Tenant Portal →
             </Button>
           </div>
         </div>

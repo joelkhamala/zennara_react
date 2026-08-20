@@ -35,12 +35,12 @@ export default function About() {
     {
       icon: 'target',
       title: 'Clarity',
-      description: 'No hidden fees, no surprises. Transparent reporting, honest conversations, and straightforward pricing. Our clients always know where they stand.'
+      description: 'No hidden fees, no surprises. Transparent reporting, honest conversations, and straightforward pricing. Our tenants and owners always know where they stand.'
     },
     {
       icon: 'users',
       title: 'Partnership',
-      description: 'We succeed when our clients succeed. Your property\'s performance is our priority. Your goals shape our strategy.'
+      description: 'We succeed when our tenants and owners succeed. Your property\'s performance is our priority. Your goals shape our strategy.'
     },
     {
       icon: 'zap',
@@ -123,7 +123,7 @@ export default function About() {
           <p className={styles.sectionLabel}>Core Values</p>
           <h2>How we work</h2>
           <p className={styles.sectionSubtitle}>
-            Our values guide every decision we make and shape how we serve our clients.
+            Our values guide every decision we make and shape how we serve our tenants and partners.
           </p>
         </div>
         <div className={styles.valuesGrid}>
@@ -174,7 +174,7 @@ export default function About() {
           </div>
           <div className={styles.statItem}>
             <div className={styles.statNumber}>24/7</div>
-            <div className={styles.statLabel}>Client Support</div>
+            <div className={styles.statLabel}>Tenant Support</div>
           </div>
         </div>
       </section>

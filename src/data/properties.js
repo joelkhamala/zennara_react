@@ -344,7 +344,7 @@ export const stats = [
   },
   {
     number: 95,
-    label: 'Client Satisfaction',
+    label: 'Tenant Satisfaction',
     suffix: '%'
   },
   {
@@ -453,7 +453,7 @@ export const advisoryTeam = [
     id: 1,
     name: 'Sarah Mwangi',
     role: 'Managing Director',
-    bio: 'With over 15 years in luxury real estate across East Africa, Sarah leads our advisory practice with a focus on high-net-worth clients and institutional investors.',
+    bio: 'With over 15 years in luxury real estate across East Africa, Sarah leads our advisory practice with a focus on property owners, high-net-worth tenants, and institutional investors.',
     avatar: 'SM',
     img: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=600&q=80'
   },
@@ -461,15 +461,15 @@ export const advisoryTeam = [
     id: 2,
     name: 'David Omondi',
     role: 'Investment Strategist',
-    bio: 'David specializes in development projects and investment analysis, helping clients identify opportunities with exceptional return potential across the region.',
+    bio: 'David specializes in development projects and investment analysis, helping tenants and buyers identify opportunities with exceptional return potential across the region.',
     avatar: 'DO',
     img: 'https://images.unsplash.com/photo-1560250097-0b93528c311a?w=600&q=80'
   },
   {
     id: 3,
     name: 'Amina Hassan',
-    role: 'Client Relations',
-    bio: 'Amina ensures every client receives personalized service and support throughout their property journey, from initial consultation to completion.',
+    role: 'Tenant Relations',
+    bio: 'Amina ensures every tenant and property owner receives personalized service and support throughout their property journey, from initial consultation to completion.',
     avatar: 'AH',
     img: 'https://images.unsplash.com/photo-1594744803329-e58b31de8bf5?w=600&q=80'
   }

@@ -214,7 +214,7 @@ export default function Properties() {
           <p className="eyebrow">CAN'T FIND WHAT YOU'RE LOOKING FOR?</p>
           <h2>We have more</h2>
           <p>
-            Many of our finest properties are available exclusively to registered clients. 
+            Many of our finest properties are available exclusively to registered tenants and partners. 
             Get in touch to access our full portfolio including off-market opportunities.
           </p>
           <div className={styles.ctaActions}>

@@ -58,7 +58,7 @@ class NotificationHandler {
                 New Contact Enquiry
             </div>
             <h2 style='color: #ffffff; font-size: 22px; margin: 0 0 8px 0;'>New Inquiry from {$client_name}</h2>
-            <p style='color: #a0a0a0; font-size: 14px; margin: 0;'>A new client has submitted an inquiry through the ZENNARA contact form.</p>
+            <p style='color: #a0a0a0; font-size: 14px; margin: 0;'>A new inquiry has been submitted through the ZENNARA contact form.</p>
         </div>
 
         <!-- Verification Badges -->
@@ -70,7 +70,7 @@ class NotificationHandler {
         <!-- Details Table -->
         <table style='width: 100%; border-collapse: collapse; margin-bottom: 24px; background: #181818; border-radius: 8px; overflow: hidden; border: 1px solid #2a2a2a;'>
             <tr style='border-bottom: 1px solid #2a2a2a;'>
-                <td style='padding: 12px 16px; color: #888888; font-size: 13px; width: 140px; font-weight: 600;'>Client Name</td>
+                <td style='padding: 12px 16px; color: #888888; font-size: 13px; width: 140px; font-weight: 600;'>Contact Name</td>
                 <td style='padding: 12px 16px; color: #ffffff; font-size: 14px; font-weight: 600;'>{$client_name}</td>
             </tr>
             <tr style='border-bottom: 1px solid #2a2a2a;'>

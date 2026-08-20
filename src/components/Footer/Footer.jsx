@@ -36,9 +36,9 @@ export default function Footer() {
         </div>
 
         <div className={styles.footerSection}>
-          <h4>Client Access</h4>
+          <h4>Tenant Access</h4>
           <div className={styles.footerLinks}>
-            <Link to="/portal">Client Portal</Link>
+            <Link to="/portal">Tenant Portal</Link>
             <Link to="/contact">Request Proposal</Link>
           </div>
         </div>

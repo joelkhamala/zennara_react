@@ -586,6 +586,7 @@
   min-height: 120px;
 }
 
+.tenant,
 .client {
   display: flex;
   align-items: center;
@@ -597,6 +598,7 @@
   transition: var(--transition);
 }
 
+.testimonialCard:hover .tenant,
 .testimonialCard:hover .client {
   border-color: var(--gold);
 }

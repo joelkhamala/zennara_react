@@ -30,7 +30,7 @@ export default function Advisory() {
           <div className={styles.heroStats}>
             <div>
               <strong><AnimatedNumber value={250} suffix="+" /></strong>
-              <span>Clients Served</span>
+              <span>Tenants & Owners Served</span>
             </div>
             <div>
               <strong><AnimatedNumber value={95} suffix="%" /></strong>
@@ -46,18 +46,15 @@ export default function Advisory() {
           <p className="eyebrow">Our Process</p>
           <h2>How we <em>work together.</em></h2>
           <p>
-            A proven methodology refined over years of successful client partnerships. 
+            A proven methodology refined over years of successful tenant and partner relationships. 
             We combine market expertise with personalized service to deliver exceptional results.
           </p>
         </div>
 
         <div className={styles.processGrid}>
           {advisoryProcess.map((step, index) => (
-            <div key={index} className={styles.processStep}>
-              <div className={styles.stepHeader}>
-                <div className={styles.stepNumber}>{step.number}</div>
-                <div className={styles.stepIcon}>{step.icon}</div>
-              </div>
+            <div key={index} className={styles.processCard}>
+              <div className={styles.stepNumber}>{step.step}</div>
               <h3>{step.title}</h3>
               <p>{step.description}</p>
             </div>
@@ -99,11 +96,11 @@ export default function Advisory() {
       {/* Testimonials Section */}
       <section className={styles.testimonialsSection}>
         <div className={styles.sectionHead}>
-          <p className="eyebrow">Client Stories</p>
-          <h2>What our clients <em>say.</em></h2>
+          <p className="eyebrow">Tenant Stories</p>
+          <h2>What our tenants <em>say.</em></h2>
           <p>
-            Trusted by discerning buyers and investors across East Africa. 
-            Read what our clients have to say about working with ZENNARA.
+            Trusted by discerning residents, tenants, and property owners across East Africa. 
+            Read what our tenants and partners have to say about working with ZENNARA.
           </p>
         </div>
 
@@ -111,7 +108,7 @@ export default function Advisory() {
           {testimonials.map((testimonial) => (
             <div key={testimonial.id} className={styles.testimonialCard}>
               <blockquote>{testimonial.quote}</blockquote>
-              <div className={styles.client}>
+              <div className={styles.tenant}>
                 <div className={styles.avatar}>{testimonial.avatar}</div>
                 <div>
                   <div className={styles.name}>{testimonial.name}</div>

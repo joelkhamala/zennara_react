@@ -51,7 +51,7 @@ class AuthHandler {
     /**
      * Register new user
      */
-    public function register($email, $password, $name, $type = 'client') {
+    public function register($email, $password, $name, $type = 'tenant') {
         try {
             // Validate inputs
             if (!Security::validateEmail($email)) {
@@ -66,7 +66,7 @@ class AuthHandler {
                 return $this->error('Name is required and must be at least 2 characters', 400);
             }
             
-            if (!in_array($type, ['client', 'landlord', 'admin'])) {
+            if (!in_array($type, ['tenant', 'client', 'landlord', 'admin'])) {
                 return $this->error('Invalid user type', 400);
             }
             

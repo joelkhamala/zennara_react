@@ -5,7 +5,7 @@ import styles from './Portal.module.css'
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/backend'
 
 export default function Portal() {
-  const [activeTab, setActiveTab] = useState('client')
+  const [activeTab, setActiveTab] = useState('tenant')
   const [isLogin, setIsLogin] = useState(true)
   const [showForgotPassword, setShowForgotPassword] = useState(false)
   const [showProfile, setShowProfile] = useState(false)
@@ -67,7 +67,7 @@ export default function Portal() {
         setAuthToken(token)
         setUserData(data.user)
         if (data.user.type) {
-          setActiveTab(data.user.type)
+          setActiveTab(data.user.type === 'client' ? 'tenant' : data.user.type)
         }
         setIsAuthenticated(true)
         setFormData(prev => ({
@@ -87,16 +87,20 @@ export default function Portal() {
   }
 
   const tabs = [
-    { id: 'client', label: 'Client', icon: '👤' },
+    { id: 'tenant', label: 'Tenant', icon: '👤' },
     { id: 'landlord', label: 'Landlord', icon: '🏢' },
     { id: 'admin', label: 'Admin', icon: '⚙️' }
   ]
 
   const getTabDescription = () => {
     const descriptions = {
+      tenant: {
+        login: 'Sign in to access your leased properties, requests, and documents',
+        signup: 'Create an account to manage your tenancy and payments'
+      },
       client: {
-        login: 'Sign in to access your properties, favorites, and portfolio',
-        signup: 'Create an account to start your real estate journey'
+        login: 'Sign in to access your leased properties, requests, and documents',
+        signup: 'Create an account to manage your tenancy and payments'
       },
       landlord: {
         login: 'Manage your properties and tenant relationships',
@@ -107,7 +111,7 @@ export default function Portal() {
         signup: 'Admin registration requires verification'
       }
     }
-    return descriptions[activeTab]
+    return descriptions[activeTab] || descriptions.tenant
   }
 
   const handleInputChange = (e) => {
